@@ -9,7 +9,7 @@ class Database {
     }
 
     _connect() {
-        mongoose.connect(`mongodb://${server}/${database}`, {
+        mongoose.connect(`mongodb+srv://Admin:nimda@cluster0.qdtl0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
             useNewUrlParser: true, // Evita avisos de depreciação
             useUnifiedTopology: true,
         })
