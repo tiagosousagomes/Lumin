@@ -1,14 +1,14 @@
-let mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-let postSchema = new mongoose.Schema({
+let postSchema = new Schema({
   content: {
     type: String,
     required: [true, "o conteudo da publicação é obrigatorio"],
     minlenght: [1, "o conteudo não pode estar vazio"],
   },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+  author: { type: Schema.Types.ObjectId, ref: "user", required: true },
+  likes: [{ type: Schema.Types.ObjectId, ref: "user" }],
+  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   createAt: { type: Date, default: Date.now },
   updateAt: { type: Date, default: Date.now },
 });
@@ -18,4 +18,4 @@ postSchema.pre("save", function (next) {
   next();
 });
 
-module.exports = mongoose.model("post", postSchema);
+export default model("post", postSchema);

@@ -12,7 +12,9 @@
     "vite": "^6.1.0"
   },
   "dependencies": {
+    "express": "^4.21.2",
     "mongodb": "^6.13.1",
-    "mongoose": "^8.10.1"
+    "mongoose": "^8.10.1",
+    "nodemon": "^3.1.9"
   }
 }

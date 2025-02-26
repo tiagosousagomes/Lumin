@@ -1,9 +1,9 @@
-let mongoose = require('mongoose')
+import { Schema, model } from 'mongoose'
 
-let likeSchema = new mongoose.Schema({
-    user:{type:mongoose.Schema.Types.ObjectId, ref:'user', required:true},
-    post:{type:mongoose.Schema.Types.ObjectId, ref:'post', required:true},
+let likeSchema = new Schema({
+    user:{type:Schema.Types.ObjectId, ref:'user', required:true},
+    post:{type:Schema.Types.ObjectId, ref:'post', required:true},
     createAt:{type:Date, default:Date.now}
 })
 
-module.exports = mongoose.model('like', likeSchema)
+export default model('like', likeSchema)

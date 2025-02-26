@@ -1,4 +1,4 @@
-const User = require("../models/user") 
+import User, { findOne, find } from "../models/user"; 
 
 const CreateUser = async(req, res, next) =>{
     try{
@@ -6,7 +6,7 @@ const CreateUser = async(req, res, next) =>{
         // verifica se ja existe o email
         
         const {name, password, username, bio, profilePicture, email} = req.body;
-        const existingUser = await User.findOne({email});
+        const existingUser = await findOne({email});
         if(existingUser) {
             return res.status(400).json({
                 sucess:false,
@@ -33,7 +33,7 @@ const CreateUser = async(req, res, next) =>{
 
 const getAllUser = async(req, res, next) =>{
     try{
-        const users = await User.find()
+        const users = await find()
         res.status(201).json({
             sucess:true,
             message: "lista de usuarios:",
@@ -48,7 +48,7 @@ const getAllUser = async(req, res, next) =>{
 
 const getOneUser = async(req, res, next) =>{
     try{
-        const users = await User.findOne()
+        const users = await findOne()
         res.status(201).json({
             sucess:true,
             message: "lista de usuario",

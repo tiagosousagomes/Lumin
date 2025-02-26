@@ -1,8 +1,8 @@
-let mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-let commentSchema = new mongoose.Schema({
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
-  post: { type: mongoose.Schema.Types.ObjectId, ref: "post", required: true },
+let commentSchema = new Schema({
+  author: { type: Schema.Types.ObjectId, ref: "user", required: true },
+  post: { type: Schema.Types.ObjectId, ref: "post", required: true },
   content: {
     type: String,
     required: [true, "o conteudo do comentario é obrigatorio"],
@@ -17,4 +17,4 @@ postSchema.pre("save", function (next) {
   next();
 });
 
-module.exports = mongoose.model("comment", commentSchema);
+export default model("comment", commentSchema);

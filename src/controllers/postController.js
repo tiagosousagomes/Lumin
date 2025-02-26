@@ -1,4 +1,4 @@
-const Post = require("../models/post");
+import Post from "../models/post";
 
 const createPost = async (req, res) => {
     try {
@@ -52,4 +52,4 @@ const deletePost = async (req, res) => {
     // Implementação para deletar um post
 };
 
-module.exports = { createPost, getAllPosts, getPostById, updatePost, deletePost };
+export default { createPost, getAllPosts, getPostById, updatePost, deletePost };
