@@ -2,7 +2,7 @@ const User = require("../models/user")
 
 const CreateUser = async(req, res, next) =>{
     try{
-    
+
         // verifica se ja existe o email
         
         const {name, password, username, bio, profilePicture, email} = req.body;
