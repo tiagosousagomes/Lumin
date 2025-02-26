@@ -1,9 +1,9 @@
 require("dotenv").config();
-const express = require("express");
+import express, { json } from "express";
 const app = express();
-const database = require("../src/database/database");
+import database from "../src/database/database";
 
-app.use(express.json());
+app.use(json());
 
-const userController = require("../src/controllers/")
+import userController from "../src/controllers/";
 

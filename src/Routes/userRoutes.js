@@ -1,10 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const userController = require("../controllers/userController");
+import { Router } from "express";
+const router = Router();
+import { getAllUser, createUser, getOneUser, updateUser, deleteUser } from "../controllers/userController";
 
-router.get("/", userController.getAllUser());
-router.post("/", userController.createUser());
-router.get("/:id", userController.getOneUser());
-router.put("/:id", userController.updateUser());
-router.delete("/:id", userController.deleteUser());
+router.get("/", getAllUser());
+router.post("/", createUser());
+router.get("/:id", getOneUser());
+router.put("/:id", updateUser());
+router.delete("/:id", deleteUser());
 

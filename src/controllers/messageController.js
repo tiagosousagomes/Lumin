@@ -1,4 +1,4 @@
-const Message = require("../models/message");
+import Message from "../models/message";
 
 const sendMessage = async (req, res) => {
     // Implementação para enviar uma mensagem
@@ -12,4 +12,4 @@ const deleteMessage = async (req, res) => {
     // Implementação para deletar uma mensagem
 };
 
-module.exports = { sendMessage, getMessages, deleteMessage };
+export default { sendMessage, getMessages, deleteMessage };

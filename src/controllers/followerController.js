@@ -1,4 +1,4 @@
-const Follower = require("../models/follower");
+import Follower from "../models/follower";
 
 const followUser = async (req, res) => {
     // Implementação para seguir um usuário
@@ -16,4 +16,4 @@ const getFollowing = async (req, res) => {
     // Implementação para listar quem um usuário está seguindo
 };
 
-module.exports = { followUser, unfollowUser, getFollowers, getFollowing };
+export default { followUser, unfollowUser, getFollowers, getFollowing };

@@ -1,4 +1,4 @@
-const Comment = require("../models/comment");
+import Comment from "../models/comment";
 
 const createComment = async (req, res) => {
     // Implementação para criar um comentário
@@ -16,4 +16,4 @@ const deleteComment = async (req, res) => {
     // Implementação para deletar um comentário
 };
 
-module.exports = { createComment, getCommentsByPost, updateComment, deleteComment };
+export default { createComment, getCommentsByPost, updateComment, deleteComment };

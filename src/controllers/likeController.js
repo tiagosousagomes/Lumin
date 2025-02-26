@@ -1,4 +1,4 @@
-const Like = require("../models/like");
+import Like from "../models/like";
 
 const likePost = async (req, res) => {
     // Implementação para curtir um post
@@ -12,4 +12,4 @@ const getLikesByPost = async (req, res) => {
     // Implementação para listar curtidas de um post
 };
 
-module.exports = { likePost, unlikePost, getLikesByPost };
+export default { likePost, unlikePost, getLikesByPost };
