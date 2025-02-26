@@ -1,5 +1,7 @@
-import { connect, connection } from "mongoose";
+const mongoose = require("mongoose");
 
+const server = "localhost:27017"; // Porta corrigida para 27017
+const database = "nexora";
 
 class Database {
     constructor() {
@@ -7,7 +9,7 @@ class Database {
     }
 
     _connect() {
-        connect(`mongodb+srv://Admin:nimda@cluster0.qdtl0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
+        mongoose.connect(`mongodb+srv://Admin:nimda@cluster0.qdtl0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
             useNewUrlParser: true, // Evita avisos de depreciação
             useUnifiedTopology: true,
         })
@@ -19,18 +21,18 @@ class Database {
         });
 
         // Eventos adicionais para monitorar a conexão
-        connection.on('connected', () => {
+        mongoose.connection.on('connected', () => {
             console.log('Mongoose connected to DB');
         });
 
-        connection.on('error', (err) => {
+        mongoose.connection.on('error', (err) => {
             console.error('Mongoose connection error:', err.message);
         });
 
-        connection.on('disconnected', () => {
+        mongoose.connection.on('disconnected', () => {
             console.log('Mongoose disconnected from DB');
         });
     }
 }
 
-export default new Database();
+module.exports = new Database();
