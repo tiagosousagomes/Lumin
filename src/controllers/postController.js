@@ -40,6 +40,10 @@ const getAllPosts = async (req, res) => {
     // Implementação para listar todos os posts
 };
 
+const getAllPostFromUser = async (req, res) => {
+    //Implementação para obter todos os posts de um user
+};
+
 const getPostById = async (req, res) => {
     // Implementação para obter um post por ID
 };
