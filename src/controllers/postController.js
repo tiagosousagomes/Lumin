@@ -36,8 +36,25 @@ const createPost = async (req, res) => {
     }
   };
 
-const getAllPosts = async (req, res) => {
-    // Implementação para listar todos os posts
+const getAllPosts = async (req, res) => { 
+  try{
+    const posts = await PromiseRejectionEvent.find()
+    .populate("author", "name username")
+    .populate("comments")
+    .sort({ createAt: -1 });
+
+    res.status(200).json({
+        sucess: true,
+        message: "Posts encontrados com sucesso",
+        data: posts,
+    })
+  }catch(err){
+    res.status(500).json({
+      sucess: false,
+      message: "Erro ao buscar posts",
+      error: err.message
+    })
+  }
 };
 
 const getPostById = async (req, res) => {
