@@ -28,6 +28,7 @@ const CreateUser = async(req, res, next) =>{
     }catch(err){
      next(err)
     }
+}
 
     //listar todos os usuarios
 
@@ -42,7 +43,7 @@ const getAllUser = async(req, res, next) =>{
     }catch(err){
      next(err)
         }
-    }}    
+    }
 
   //  listar apenas um usuario
 
@@ -64,4 +65,17 @@ const getOneUser = async(req, res, next) =>{
 const updateUser = async(req, res, next) => {
     
 }
+
 // deletar usuario
+const deleteUser = async(req, res, next) => {
+    
+}
+
+// Exportando as funções
+module.exports = {
+    CreateUser,
+    getAllUser,
+    getOneUser,
+    updateUser,
+    deleteUser,
+};
