@@ -5,7 +5,7 @@ let userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "a senha é obrigatoria"],
-    minlenght: [6, "a senha deve conter pelo menos 6 digitos"],
+    minlength: [6, "a senha deve conter pelo menos 6 digitos"],
   },
   username: {
     type: String,
