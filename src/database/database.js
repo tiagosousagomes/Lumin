@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
 
-const server = "localhost:27017"; // Porta corrigida para 27017
-const database = "nexora";
-
 class Database {
     constructor() {
         this._connect();
