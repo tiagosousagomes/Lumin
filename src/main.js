@@ -11,7 +11,7 @@ app.use('/users', userRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
-    res.send('API está funcionando!');
+    res.send('API ESTÁ FUNCIONANDO!');
 });
 
 // Iniciar o servidor
