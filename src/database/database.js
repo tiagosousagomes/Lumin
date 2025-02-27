@@ -7,8 +7,7 @@ class Database {
 
     _connect() {
         mongoose.connect(`mongodb+srv://Admin:nimda@cluster0.qdtl0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`, {
-            useNewUrlParser: true, // Evita avisos de depreciação
-            useUnifiedTopology: true,
+
         })
         .then(() => {
             console.log('Database connection successful');
