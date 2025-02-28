@@ -1,21 +1,29 @@
-const express = require("express");
-const userRoutes = require("../src/routes/userRoute.js")
+// src/main.js
+const express = require('express');
+const Database = require('./database/database');
+const userRoutes = require('./routes/userRoute');
 
+// Configurações do Express
 const app = express();
-
-// Middleware para parsear JSON
 app.use(express.json());
 
-// Usar as rotas de usuário
-app.use('/users', userRoutes);
+// Conectar ao banco de dados
+const db = new Database("mongodb+srv://admin123:admin123@lumin.qdtl0.mongodb.net/?retryWrites=true&w=majority&appName=Lumin");
 
-// Rota de teste
-app.get('/', (req, res) => {
-    res.send('API ESTÁ FUNCIONANDO!');
-});
+db.connect()
+    .then(() => {
+        console.log('Database connected successfully');
 
-// Iniciar o servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+        // Rotas
+        app.use('/users', userRoutes);
+
+        // Iniciar o servidor
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('Failed to connect to the database:', err.message);
+        process.exit(1); // Encerra o processo em caso de erro
+    });
