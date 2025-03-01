@@ -1,6 +1,6 @@
 const User = require("../models/user") 
 
-const CreateUser = async(req, res, next) =>{
+const createUser = async(req, res, next) =>{
     try{
 
         // verifica se ja existe o email
@@ -73,6 +73,6 @@ const deleteUser = async(req, res, next) => {
 
 // Exportando as funções
 module.exports = {
-    CreateUser
+    createUser
    
 };
