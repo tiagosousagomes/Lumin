@@ -1,14 +1,15 @@
 // src/main.js
 const express = require('express');
-const Database = require('./database/database');
+
 const userRoutes = require('./routes/userRoute');
+const database = require('./database/database');
 
 // Configurações do Express
 const app = express();
 app.use(express.json());
 
 // Conectar ao banco de dados
-const db = new Database("mongodb+srv://admin123:admin123@lumin.qdtl0.mongodb.net/?retryWrites=true&w=majority&appName=Lumin");
+const db = database("mongodb+srv://admin123:admin123@lumin.qdtl0.mongodb.net/?retryWrites=true&w=majority&appName=Lumin");
 
 db.connect()
     .then(() => {
@@ -18,7 +19,7 @@ db.connect()
         app.use('/users', userRoutes);
 
         // Iniciar o servidor
-        const PORT = process.env.PORT || 3000;
+        const PORT = process.env.PORT || 3001;
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
         });

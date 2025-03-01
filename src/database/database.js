@@ -1,36 +1,65 @@
 // src/database/Database.js
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); //e quem se "importa" kkkkkk
 
 class Database {
-    constructor(connectionString) {
+    constructor(connectionString) {     //connectionString guarda a string de conexão com o atlas
+        if (!connectionString){         //verifica se conectou, se não conectar ele mostra o erro "connection is a required"
+            throw new error('Connection is a required!')
+        }
         this.connectionString = connectionString;
-        this.connection = null;
+        this.connection = null;  //inicia com null que é pra guardar a conexão com o BD
     }
 
     async connect() {
         try {
-            await mongoose.connect(this.connectionString, {
-                useNewUrlParser: true,
+            await mongoose.connect(this.connectionString, {  //mongoose.connect é literalmente conectar com o Mongo
+                useNewUrlParser: true,   //evita aviso de depreciação
                 useUnifiedTopology: true,
             });
-            console.log('Database connection successful');
+            console.log('Database Connect!')         //esses this.connection.on são pra monitorar o estado da conexão, ai que não sei oq sai do bd, toma disconnect
             this.connection = mongoose.connection;
+
+
+            this.connection.on('connected', () =>{
+                console.log('Mongoose connected to DB');
+            }) 
+
+            this.connection.on('disconnect', () =>{
+                console.log('Mongoose disconnect from DB');
+            })
+
+            this.connection.on('error', () =>{
+                console.log('Mongoose connection error:', err.message);
+            })
+
+
         } catch (err) {
-            console.error('Database connection error:', err.message);
+            console.log('Database connection error:', err.message);
             throw err; // Lança o erro para ser tratado externamente
         }
     }
 
-    async disconnect() {
+    async disconnect() {  //esse aqui é basicamente voce sair do banco de dados, e ele verificar se voce desconectou direitinho
         if (this.connection) {
             await this.connection.close();
-            console.log('Mongoose disconnected from DB');
+            logger.warn('Mongoose disconnected from DB');
         }
     }
 
-    getConnection() {
+    getConnection() {  //vai pegar e ver se ja tem uma conexão no banco de dados, se tiver ai lança erro
+        if(!this.connection){
+            throw new error('No active connection BD') 
+        }
         return this.connection;
     }
 }
 
-module.exports = Database;
+// Faz com que só uma instancia do banco de dados seja criada HAHAHAHAHA
+let instance = null;
+
+module.exports = (connectionString) => {
+    if (!instance) {
+        instance = new Database(connectionString);
+    }
+    return instance;
+};
