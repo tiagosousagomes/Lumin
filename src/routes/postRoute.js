@@ -3,19 +3,19 @@ const postController = require("../controllers/postController")
 const router = express.Router();
 
 
-// // Rota para Listar Post
-// router.get('/',postController.getPost)
+// rota para listar todos os post
+router.get('/',postController.getAllPosts)
 
-// // Rota para listar post pelo ID
-// router.get('/:id', postController.getPostById)
+// Rota para listar post por usuario
+router.get('/:id', postController.getAllPostFromUser)
 
 // Rota para criar Post
 router.post('/', postController.createPost);
 
-// // Rota para atualizar usuário 
+// Rota para atualizar usuário 
 // router.put('/:id',postController.updatePost)
 
 // Rota para deletar usuario
-// router.delete('/:id',postController.deletePost)
+ router.delete('/:id',postController.deletePost)
 
 module.exports = router; 
