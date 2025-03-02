@@ -4,10 +4,10 @@ const router = express.Router();
 
 
 
-// Listar usuarios
-router.get('/',userController.getUser)
+// Rota para Listar todos os usuarios
+router.get('/',userController.getAllUser)
 
-// Listar usuario pelo ID
+// Rota para Listar usuario pelo ID
 router.get('/:id', userController.getUserById)
 
 // Rota para criar um usuário (POST /users)
