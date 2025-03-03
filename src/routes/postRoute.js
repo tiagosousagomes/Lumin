@@ -13,7 +13,7 @@ router.get('/:id', postController.getAllPostFromUser)
 router.post('/', postController.createPost);
 
 // Rota para atualizar usuário 
-// router.put('/:id',postController.updatePost)
+router.put('/:id',postController.updatePost)
 
 // Rota para deletar usuario
  router.delete('/:id',postController.deletePost)

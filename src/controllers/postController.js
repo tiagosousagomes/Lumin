@@ -84,9 +84,9 @@ const getPostById = async (req, res) => {
       const postID = req.params.id
       
       const posts =  await Post.findById(postID)
-      if(!post){
+      if(!posts){
         res.status(400).json({
-          sucess:false,
+          success:false,
           message:'post não encontrado!'
         })
       }
@@ -100,9 +100,30 @@ const getPostById = async (req, res) => {
     }
 };
 
-const updatePost = async (req, res) => {
+const updatePost = async (req, res,next) => {
     // Implementação para atualizar um post
-};
+  try{
+
+    const {content} = req.body
+    
+    const posts = await Post.findByIdAndUpdate(req.params.id,{content}, { new: true, runValidators: true })
+    if(!posts){
+      res.status(400),json({
+        success:false,
+        message:'Post não encontrado!'
+      })}
+      res.status(200).json({
+        success:true,
+        message:'post atualizado com sucesso',
+        data:posts
+      })
+
+  }catch(err){
+    next(err)
+  
+  }}
+
+    ;
 
 const deletePost = async (req, res) => {
     // Implementação para deletar um post
@@ -123,4 +144,4 @@ const deletePost = async (req, res) => {
   }
 };
 
-module.exports = {createPost,getAllPosts,getAllPostFromUser,deletePost}
+module.exports = {createPost,getAllPosts,getAllPostFromUser,updatePost,deletePost}
