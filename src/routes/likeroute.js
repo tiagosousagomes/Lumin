@@ -9,10 +9,10 @@ router.post('/', likeController.likePost);
 
 
 // Rota para dar deslike
-router.delete('/:id',likeController.unlikePost)
+//router.delete('/:id',likeController.unlikePost)
 
 // Rota para Listar likes de um post
 
-router.get('/post/post:id', likeController.getLikesByPost)
+//router.get('/post/post:id', likeController.getLikesByPost)
 
 module.exports = router; 
