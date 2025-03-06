@@ -66,7 +66,7 @@ const getAllPostFromUser = async (req, res, next) => {
           message:'usuario não encontrado'
         })
       }
-      const posts = await Post.find({author:userID}).populate('author','name, username profilePicture')
+      const posts = await Post.find({author:userID}).populate('author','name username profilePicture')
       res.status(201).json({
         success:true,
         message: 'posts do usuario:',
@@ -91,7 +91,7 @@ const getPostById = async (req, res) => {
         })
       }
       res.status(200).json({
-        success:false,
+        success:true,
         message:'Post do ID:',
         data:posts
       })

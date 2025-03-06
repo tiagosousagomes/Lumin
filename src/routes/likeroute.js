@@ -4,15 +4,14 @@ const router = express.Router();
 
 
 
+// Rota para Listar likes de um post
+
+router.get('/post/:postID', likeController.getLikesByPost)
+
 // Rota para dar like
 router.post('/', likeController.likePost);
 
-
 // Rota para dar deslike
-//router.delete('/:id',likeController.unlikePost)
-
-// Rota para Listar likes de um post
-
-//router.get('/post/post:id', likeController.getLikesByPost)
+router.delete('/post/',likeController.unlikePost)
 
 module.exports = router; 

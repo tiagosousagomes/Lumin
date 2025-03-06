@@ -3,11 +3,13 @@ const messageController = require("../controllers/messageController")
 const router = express.Router();
 
 
-// Rota para enviar uma mensagem
-router.post('/', messageController.sendMessage);
+
 
 // Rota para obter mensagens entre dois usuários
-router.get('/:user1/:user2', messageController.getMessages);
+router.get('/', messageController.getMessages);
+
+// Rota para enviar uma mensagem
+router.post('/', messageController.sendMessage);
 
 // Rota para deletar messagem
 

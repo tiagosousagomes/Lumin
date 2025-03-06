@@ -2,6 +2,7 @@ const Like = require("../models/likes");
 const User = require("../models/user");
 const Post = require("../models/post")
 
+
 const likePost = async (req, res) => {
     // Implementação para curtir um post
     try{
@@ -52,10 +53,57 @@ const likePost = async (req, res) => {
 
 const unlikePost = async (req, res) => {
     // Implementação para remover uma curtida de um post
+
+    
+      try{
+        const {userID, postID} = req.body;
+
+        const like = await Like.findByIdAndDelete({user: userID, post:postID})
+  
+        if(!like){
+          return res.status(400).json({
+              success:false,
+              message:'Curtida não encontrada'
+          })
+          
+         }
+         res.status(200).json({
+          success:true,
+          message:'curtida removida',
+         })
+      }catch(err){
+        res.status(500).json({
+            success:false,
+            message:'erro ao curtir',
+            error:err.message
+        })
+      }
+
 };
 
 const getLikesByPost = async (req, res) => {
     // Implementação para listar curtidas de um post
+
+    try{
+
+        const postID = req.params.postID
+
+
+        const likes = await Like.find({post:postID}).populate('user','name username profilePicture')
+
+
+        res.status(200).json({
+            success: true,
+            message: "Curtidas encontradas com sucesso.",
+            data: likes
+        });
+    }catch(err){
+        res.status(500).json({
+            success:false,
+            message:'erro ao listar curtidas',
+            error:err.message
+        })
+    }
 };
 
-module.exports = {likePost};
+module.exports = {likePost,unlikePost,getLikesByPost};
