@@ -124,6 +124,8 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+
+// Autenticar usuario 
 const userAutenticator = async (req, res, next) => {
   try {
     const {email, password} = req.body;
