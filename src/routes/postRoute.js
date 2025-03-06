@@ -7,7 +7,11 @@ const router = express.Router();
 router.get('/',postController.getAllPosts)
 
 // Rota para listar post por usuario
-router.get('/:id', postController.getAllPostFromUser)
+router.get('user/:id', postController.getAllPostFromUser)
+
+// Rota para listar post por ID
+
+router.get('/:id',postController.getPostById)
 
 // Rota para criar Post
 router.post('/', postController.createPost);

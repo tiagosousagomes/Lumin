@@ -7,7 +7,7 @@ let postSchema = new mongoose.Schema({
     minlenght: [1, "o conteudo não pode estar vazio"],
   },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "user", default:[] }],
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   createAt: { type: Date, default: Date.now },
   updateAt: { type: Date, default: Date.now },
