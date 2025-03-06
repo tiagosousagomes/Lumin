@@ -1,4 +1,8 @@
 const User = require("../models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken"); 
+
+const JWT_EXPIRATION = "1h";
 
 const createUser = async (req, res, next) => {
   try {
@@ -9,15 +13,17 @@ const createUser = async (req, res, next) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "email já em uso",
+        message: "Email já em uso",
       });
     }
 
     // Criar usuario
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       name,
-      password,
+      password: hashedPassword,
       username,
       bio,
       profilePicture,
@@ -27,7 +33,7 @@ const createUser = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: "usuario criado com sucesso",
+      message: "Usuario criado com sucesso",
       data: user,
     });
   } catch (err) {
@@ -40,9 +46,9 @@ const createUser = async (req, res, next) => {
 const getAllUser = async (req, res, next) => {
   try {
     const users = await User.find();
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "lista de usuarios:",
+      message: "Lista de usuarios:",
       data: users,
     });
   } catch (err) {
@@ -55,16 +61,16 @@ const getAllUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const userID = req.params.id;
-    const users = await User.findOne(userID);
+    const users = await User.findById(userID);
 
     if (!users) {
-      res.status(400).json({
+      res.status(404).json({
         success: false,
-        message: "usuario não encontrado",
+        message: "Usuario não encontrado",
       });
       res.status(200).json({
         sucess: false,
-        message: "usuario correspondente ao ID:",
+        message: "Usuario correspondente ao ID:",
         data: users,
       });
     }
@@ -85,12 +91,12 @@ const updateUser = async (req, res, next) => {
     if (!users) {
      return res.status(400).json({
         success: false,
-        message: "usuario não encontrado",
+        message: "Usuario não encontrado",
       });
     }
     res.status(200).json({
       success: true,
-      message: "usuario atualizado com sucesso!",
+      message: "Usuario atualizado com sucesso!",
       data: users
     });
   } catch(err) {
@@ -105,18 +111,57 @@ const deleteUser = async (req, res, next) => {
     if (!users) {
       res.stauts(400).json({
         success: false,
-        message: "usuario não encontrado!",
+        message: "Usuario não encontrado!",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "usuario excluido com sucesso!",
+      message: "Usuario excluido com sucesso!",
     });
   } catch (err) {
     next(err);
   }
 };
+
+const userAutenticator = async (req, res, next) => {
+  try {
+    const {email, password} = req.body;
+    const user = await User.findOne({email})
+
+    if(!user) {
+      return res.status(401).json({
+        sucess: false,
+        message: "Email ou senha incorretos.",
+      });
+    } 
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if(!passwordMatch) {
+      return res.status(401).json({
+        sucess: false,
+        message: "Email ou senha incorretos.",
+    });
+  }
+      const token = jwt.sign({userId: user._id}, JWT_SECRET, {
+        expiresIn: JWT_EXPIRATION,
+      });
+      res.status(200).json({
+        sucess: true,
+        message: "Autenticação bem-sucedida",
+        token: token,
+        user: {
+          _id: user._id,
+          name: user.name, 
+          email: user.email,
+          username: user.username,
+        },
+      });
+   }catch (err){
+    next(err)
+  } 
+};
+ 
 
 // Exportando as funções
 module.exports = {
@@ -125,4 +170,5 @@ module.exports = {
   getUserById,
   updateUser,
   deleteUser,
+  userAutenticator,
 };
