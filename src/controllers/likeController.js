@@ -52,9 +52,6 @@ const likePost = async (req, res) => {
 };
 
 const unlikePost = async (req, res) => {
-    // Implementação para remover uma curtida de um post
-
-    
       try{
         const {userID, postID} = req.body;
 
