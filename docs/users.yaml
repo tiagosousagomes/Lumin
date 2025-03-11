@@ -1,0 +1,89 @@
+paths:
+  /users:
+    get:
+      summary: Lista todos os usuários
+      tags:
+        - Users
+      responses:
+        200:
+          description: Lista de usuários retornada com sucesso
+
+    post:
+      summary: Cria um novo usuário
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                role:
+                  type: string
+      responses:
+        201:
+          description: Usuário criado com sucesso
+
+  /users/{id}:
+    get:
+      summary: Retorna um usuário específico
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do usuário
+      responses:
+        200:
+          description: Usuário encontrado com sucesso
+
+    put:
+      summary: Atualiza um usuário existente
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do usuário a ser atualizado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                role:
+                  type: string
+      responses:
+        200:
+          description: Usuário atualizado com sucesso
+
+    delete:
+      summary: Deleta um usuário
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do usuário a ser deletado
+      responses:
+        200:
+          description: Usuário deletado com sucesso
