@@ -5,6 +5,7 @@ let messageSchema = new mongoose.Schema({
     receiver:{type:mongoose.Schema.Types.ObjectId, ref:'user', required:true},
     content:{type:String, required: true},
     read:{type:Boolean, default:false},
+    iv: {type:String, default: true},
     createAt:{type:Date, default:Date.now},
 },
     {createAt: true}

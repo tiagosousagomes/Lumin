@@ -1,5 +1,31 @@
 const Message = require("../models/message");
 const User = require("../models/user");
+const crypto = require('crypto');
+
+
+// SISTEMA PARA CRIPTOGRAFIA DE MENSAGENS
+
+const SECRET_KEY = 'minha_senha_e_admin_123'
+const ALGORITHM = 'aes-256-cbc' // utilizei o algoritimo que já crip, e descrip
+
+
+const encryptMessage = (message) => {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(SECRET_KEY), iv);
+  let encrypted = cipher.update(message, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return { encryptMessage: encrypted, iv: iv.toString('hex')};
+};
+
+
+const decryptMessage = (encryptMessage, iv) => {
+  const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(SECRET_KEY), Buffer.from(iv, 'hex'));
+  let decrypted = decipher.update(encryptMessage, 'hex', 'utf8');
+  decrypted += decipher.final('utf-8');
+  return decrypted;
+}
+
+
 
 const sendMessage = async (req, res) => {
     try{
@@ -15,10 +41,13 @@ const sendMessage = async (req, res) => {
             });
         }
 
+        const { encryptedMessage, iv } = encryptMessage(content);
+
         const message = new Message({
             sender: sender._id,
             receiver: receiver._id,
-            content,
+            content: encryptedMessage,
+            iv: iv,
         });
 
         await message.save();
@@ -72,10 +101,15 @@ const getMessages = async (req, res) => {
             ],
         }).sort({creatAt: 1});
 
+        const decryptedMessages = messages.map(message => {
+            const decryptedContent = decryptMessage(message.content, message.iv);
+            return { ...message.toObject(), content: decryptedContent };
+        })
+
         res.status(200).json({
             sucess:true,
             message: "Mensagens recuperadas com sucesso",
-            data: messages,
+            data: decryptedMessages,
         });
     }catch(err){
         next(err);
