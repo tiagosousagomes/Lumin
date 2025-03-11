@@ -67,6 +67,8 @@ const getAllPostFromUser = async (req, res, next) => {
         })
       }
       const posts = await Post.find({author:userID}).populate('author','name username profilePicture')
+
+      console.log(posts)
       res.status(201).json({
         success:true,
         message: 'posts do usuario:',

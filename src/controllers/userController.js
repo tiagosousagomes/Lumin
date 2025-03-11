@@ -63,17 +63,19 @@ const getUserById = async (req, res, next) => {
     const userID = req.params.id;
     const users = await User.findById(userID);
 
+    console.log(users)
     if (!users) {
       res.status(404).json({
         success: false,
         message: "Usuario não encontrado",
       });
-      res.status(200).json({
-        sucess: false,
-        message: "Usuario correspondente ao ID:",
-        data: users,
-      });
+     
     }
+    res.status(200).json({
+      sucess: true,
+      message: "Usuario correspondente ao ID:",
+      data: users,
+    });
   } catch (err) {
     next(err);
   }

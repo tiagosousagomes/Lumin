@@ -11,12 +11,12 @@ const createComment = async (req, res) => {
             const user = await User.findById(userID)
             const post = await Post.findById(postID)
 
-            // if(!user || !post){
-            //     return res.status(404).json({
-            //         success:false,
-            //         message: "Usuario ou post não encontrado!"
-            //     })
-            // }
+             if(!user || !post){
+                 return res.status(404).json({
+                     success:false,
+                     message: "Usuario ou post não encontrado!"
+                 })
+             }
 
             const comment = new Comment({author: userID, post: postID, content});
             await comment.save();
@@ -44,13 +44,15 @@ const getCommentsByPost = async (req, res) => {
             const postID = req.params.postID
     
     
-            const comment = await Comment.find({post:postID}).populate('user','name username profilePicture')
+            const comment = await Comment.find({post:postID}).populate('author','name username profilePicture')
+
+            console.log(comment)
     
     
             res.status(200).json({
                 success: true,
                 message: "comentarios encontradas com sucesso.",
-                data: likes
+                data: comment
             });
         }catch(err){
             res.status(500).json({
