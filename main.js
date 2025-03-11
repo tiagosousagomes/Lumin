@@ -6,6 +6,7 @@ const postRoutes = require('./src/routes/postRoute')
 const likeRoutes = require('./src/routes/likeroute')
 const commentRoutes = require('./src/routes/commentRoute');
 const followerRoutes = require('./src/routes/followerRoute');
+const { swaggerUi, specs } = require("./swagger");
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ mongoose.connect(process.env.MONGODB_URI)
         app.use('/likes',likeRoutes)
         app.use('/comments', commentRoutes);
         app.use('/follow', followerRoutes)
+
+        app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
         // Inicia o servidor
         const PORT = process.env.PORT;
