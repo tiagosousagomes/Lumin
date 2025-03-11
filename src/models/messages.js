@@ -6,6 +6,8 @@ let messageSchema = new mongoose.Schema({
     content:{type:String, required: true},
     read:{type:Boolean, default:false},
     createAt:{type:Date, default:Date.now},
-})
+},
+    {createAt: true}
+);
 
 module.exports = mongoose.model('message',messageSchema)
