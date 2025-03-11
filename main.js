@@ -5,6 +5,7 @@ const userRoutes = require('./src/routes/userRoute');
 const postRoutes = require('./src/routes/postRoute')
 const likeRoutes = require('./src/routes/likeroute')
 const commentRoutes = require('./src/routes/commentRoute');
+const followerRoutes = require('./src/routes/followerRoute');
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ mongoose.connect(process.env.MONGODB_URI)
         app.use('/posts',postRoutes);
         app.use('/likes',likeRoutes)
         app.use('/comments', commentRoutes);
+        app.use('/follow', followerRoutes)
 
         // Inicia o servidor
         const PORT = process.env.PORT;

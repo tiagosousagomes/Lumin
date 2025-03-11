@@ -1,4 +1,4 @@
-const Follower = require("../models/follower");
+const Follower = require("../models/followers");
 const User = require("../models/user");
 
 const followUser = async (req, res) => {
@@ -44,15 +44,68 @@ const followUser = async (req, res) => {
 };
 
 const unfollowUser = async (req, res) => {
-    // Implementação para deixar de seguir um usuário
+    try{
+        const { followerID, followingID } = req.body;
+
+        const follow = await Follower.findOneAndDelete({
+            follower: followerID,
+            following: followingID
+        });
+
+        if (!follow) {
+            return res.status(404).json({ 
+                succsess: false,
+                message: "Você não segue este usuário" });
+        }
+
+        res.status(200).json({ 
+            succsess: true,
+            message: "Você deixou de seguir este usuário" });
+    }
+    catch(err){
+        res.status(500).json({ 
+            succsess: false,
+            message: "Erro ao deixar de seguir usuário" });
+    }
 };
 
 const getFollowers = async (req, res) => {
-    // Implementação para listar seguidores de um usuário
+    try{
+        const { userID } = req.params;
+
+        const followers = await Follower.find({ following: userID })
+            .populate("follower", "name username profilePicture");
+
+        res.status(200).json({
+            succsess: true,
+            message: "Seguidores encontrados",
+            followers: followers
+        });
+    }   
+    catch(err){
+        res.status(500).json({ 
+            succsess: false,
+            message: "Erro ao buscar seguidores" });
+    }
 };
 
 const getFollowing = async (req, res) => {
-    // Implementação para listar quem um usuário está seguindo
+    try{
+        const { userID } = req.params;
+
+        const following = await Follower.find({ follower: userID })
+            .populate("following", "name username profilePicture");
+
+        res.status(200).json({
+            succsess: true,
+            message: "Lista de usuários seguidos recuperada com sucesso",
+            following: following
+        });
+    }catch(err){
+        res.status(500).json({ 
+            succsess: false,
+            message: "Erro ao buscar lista de usuários" });
+    }
 };
 
 module.exports = { followUser, unfollowUser, getFollowers, getFollowing };

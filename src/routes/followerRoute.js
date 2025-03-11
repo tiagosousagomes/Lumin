@@ -2,18 +2,12 @@ const express = require("express")
 const followController = require("../controllers/followerController")
 const router = express.Router();
 
-
-
-// Rota para dar seguir
 router.post('/', followController.followUser);
 
+router.delete('/',followController.unfollowUser)
 
-// Rota para dar deslike
-router.delete('/:id',followController.unfollowUser)
+router.get('/followers/:userID', followController.getFollowers);
 
-// Rota para Listar likes de um post
-
-router.get('/followers/:userId', followController.getFollowers); 
-router.get('/following/:userId', followController.getFollowing); 
+router.get('/following/:userID', followController.getFollowing); 
 
 module.exports = router; 
