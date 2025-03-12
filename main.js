@@ -20,8 +20,8 @@ mongoose.connect(process.env.MONGODB_URI)
         console.log('Banco de dados conectado com sucesso!');
 
         app.use('/api', userRoutes);
-        app.use('/api',postRoutes);
-        app.use('/api',likeRoutes)
+        app.use('/api', postRoutes);
+        app.use('/api', likeRoutes)
         app.use('/api', commentRoutes);
         app.use('/api', followerRoutes);
         app.use('/api', messagesRoutes)

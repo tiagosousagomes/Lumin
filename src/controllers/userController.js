@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken"); 
+const jwt = require("jsonwebtoken");
 
 const JWT_EXPIRATION = "1h";
 
@@ -18,7 +18,7 @@ const createUser = async (req, res, next) => {
     }
 
     // Criar usuario
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -63,13 +63,12 @@ const getUserById = async (req, res, next) => {
     const userID = req.params.id;
     const users = await User.findById(userID);
 
-    console.log(users)
+    console.log(users);
     if (!users) {
       res.status(404).json({
         success: false,
         message: "Usuario não encontrado",
       });
-     
     }
     res.status(200).json({
       sucess: true,
@@ -91,7 +90,7 @@ const updateUser = async (req, res, next) => {
       { new: true, runValidators: true }
     );
     if (!users) {
-     return res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Usuario não encontrado",
       });
@@ -99,10 +98,10 @@ const updateUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Usuario atualizado com sucesso!",
-      data: users
+      data: users,
     });
-  } catch(err) {
-    next(err)
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -128,42 +127,41 @@ const deleteUser = async (req, res, next) => {
 
 const userAutenticator = async (req, res, next) => {
   try {
-    const {email, password} = req.body;
-    const user = await User.findOne({email})
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-    if(!user) {
+    if (!user) {
       return res.status(401).json({
         sucess: false,
         message: "Email ou senha incorretos.",
       });
-    } 
+    }
     const passwordMatch = await bcrypt.compare(password, user.password);
 
-    if(!passwordMatch) {
+    if (!passwordMatch) {
       return res.status(401).json({
         sucess: false,
         message: "Email ou senha incorretos.",
+      });
+    }
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: JWT_EXPIRATION,
     });
+    res.status(200).json({
+      sucess: true,
+      message: "Autenticação bem-sucedida",
+      token: token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+      },
+    });
+  } catch (err) {
+    next(err);
   }
-      const token = jwt.sign({userId: user._id}, JWT_SECRET, {
-        expiresIn: JWT_EXPIRATION,
-      });
-      res.status(200).json({
-        sucess: true,
-        message: "Autenticação bem-sucedida",
-        token: token,
-        user: {
-          _id: user._id,
-          name: user.name, 
-          email: user.email,
-          username: user.username,
-        },
-      });
-   }catch (err){
-    next(err)
-  } 
 };
- 
 
 // Exportando as funções
 module.exports = {
