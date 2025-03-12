@@ -3,19 +3,9 @@ const messageController = require("../controllers/messageController")
 const router = express.Router();
 
 
-
-
-// Rota para obter mensagens entre dois usuários
-router.get('/', messageController.getMessages);
-
-// Rota para marcar as mensagens como lidas (re-see)
-router.patch('/', messageController.markMessageAsRead)
-
-// Rota para enviar uma mensagem
-router.post('/', messageController.sendMessage);
-
-// Rota para deletar messagem
-
-router.delete('/:id', messageController.deleteMessage)
+router.get('/message/', messageController.getMessages);
+router.patch('/message/', messageController.markMessageAsRead)
+router.post('/message/', messageController.sendMessage);
+router.delete('/message/:id', messageController.deleteMessage)
 
 module.exports = router;

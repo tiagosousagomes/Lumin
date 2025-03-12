@@ -3,17 +3,8 @@ const likeController = require("../controllers/likeController")
 const router = express.Router();
 
 
-
-// Rota para Listar likes de um post
-
-router.get('/post/:postID', likeController.getLikesByPost)
-
-// Rota para dar like
-
-router.post('/', likeController.likePost);
-
-// Rota para dar deslike
-
-router.delete('/post/',likeController.unlikePost)
+router.get('/like/post/:postID', likeController.getLikesByPost)
+router.post('/like/', likeController.likePost);
+router.delete('/like/post/',likeController.unlikePost)
 
 module.exports = router; 
