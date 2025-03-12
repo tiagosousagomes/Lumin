@@ -1,5 +1,5 @@
 paths:
-  /posts:
+  /api/post:
     get:
       summary: Lista todos os posts
       tags:
@@ -27,7 +27,7 @@ paths:
         201:
           description: Post criado com sucesso
 
-  /posts/user/{id}:
+  /api/post/user/{id}:
     get:
       summary: Lista posts de um usuário específico
       tags:
@@ -43,7 +43,7 @@ paths:
         200:
           description: Lista de posts do usuário
 
-  /posts/{id}:
+  /api/post/{id}:
     get:
       summary: Retorna um post específico
       tags:

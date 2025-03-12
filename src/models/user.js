@@ -1,5 +1,6 @@
 let mongoose = require("mongoose");
 
+
 let userSchema = new mongoose.Schema({
   name: { type: String, required: [true, "o nome é obrigatório"] },
   password: {
@@ -19,7 +20,7 @@ let userSchema = new mongoose.Schema({
     },
   },
   bio: { type: String, default: "" },
-  profilePicutre: { type: String, default: "" },
+  profilePicutre: { type: Buffer },
   createdAt: { type: Date, default: Date.now },
   updateAt: { type: Date, default: Date.now },
 

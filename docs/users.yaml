@@ -1,5 +1,5 @@
 paths:
-  /users:
+  /api/user:
     get:
       summary: Lista todos os usuários
       tags:
@@ -29,7 +29,7 @@ paths:
         201:
           description: Usuário criado com sucesso
 
-  /users/{id}:
+  /api/user/{id}:
     get:
       summary: Retorna um usuário específico
       tags:

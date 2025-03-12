@@ -21,14 +21,13 @@ mongoose.connect(process.env.MONGODB_URI)
 
         app.use('/api', userRoutes);
         app.use('/api', postRoutes);
-        app.use('/api', likeRoutes)
+        app.use('/api', likeRoutes);
         app.use('/api', commentRoutes);
         app.use('/api', followerRoutes);
-        app.use('/api', messagesRoutes)
-
+        app.use('/api', messagesRoutes);
         app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-        // Inicia o servidor
+
         const PORT = process.env.PORT;
         app.listen(PORT, () => {
             console.log(`Servidor rodando...`);
@@ -36,5 +35,5 @@ mongoose.connect(process.env.MONGODB_URI)
     })
     .catch(err => {
         console.error('Falha ao conectar com o banco de dados', err.message);
-        process.exit(1); // Encerra o processo em caso de erro
+        process.exit(1); 
     });
