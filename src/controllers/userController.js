@@ -84,10 +84,10 @@ const getUserById = async (req, res, next) => {
 // Atualizar usuario
 const updateUser = async (req, res, next) => {
   try {
-    const { name, password, username, bio, profilePicture, email } = req.body;
+    const { name, username, bio, profilePicture, email } = req.body;
     const users = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email, password, username, bio, profilePicture },
+      { name, email, username, bio, profilePicture },
       { new: true, runValidators: true }
     );
     if (!users) {

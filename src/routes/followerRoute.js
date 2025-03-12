@@ -2,7 +2,11 @@ const express = require("express")
 const followController = require("../controllers/followerController")
 const router = express.Router();
 
+// Rota para seguir
+
 router.post('/', followController.followUser);
+
+//
 
 router.delete('/',followController.unfollowUser)
 

@@ -9,9 +9,11 @@ const router = express.Router();
 router.get('/post/:postID', likeController.getLikesByPost)
 
 // Rota para dar like
+
 router.post('/', likeController.likePost);
 
 // Rota para dar deslike
+
 router.delete('/post/',likeController.unlikePost)
 
 module.exports = router; 

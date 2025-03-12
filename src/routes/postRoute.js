@@ -3,7 +3,7 @@ const postController = require("../controllers/postController")
 const router = express.Router();
 
 
-// rota para listar todos os post
+// Rota para listar todos os post
 router.get('/',postController.getAllPosts)
 
 // Rota para listar post por usuario
