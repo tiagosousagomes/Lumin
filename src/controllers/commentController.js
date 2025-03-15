@@ -60,6 +60,7 @@ const getCommentsByPost = async (req, res) => {
   }
 };
 
+/* 
 const updateComment = async (req, res) => {
   try {
     const { commentID } = req.params;
@@ -90,7 +91,7 @@ const updateComment = async (req, res) => {
     });
   }
 };
-
+*/
 const deleteComment = async (req, res) => {
   try {
     const { commentID } = req.params;
@@ -119,6 +120,5 @@ const deleteComment = async (req, res) => {
 module.exports = {
   createComment,
   getCommentsByPost,
-  updateComment,
   deleteComment,
 };

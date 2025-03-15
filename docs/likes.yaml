@@ -1,0 +1,215 @@
+openapi: 3.0.0
+info:
+  title: API de Curtidas
+  version: 1.0.0
+  description: API para gerenciar curtidas em posts
+
+paths:
+  /api/like/post/{postID}:
+    get:
+      summary: Listar curtidas de um post
+      tags:
+        - Likes
+      description: Retorna todas as curtidas de um post específico. Se o post não tiver curtidas, retorna uma mensagem informando.
+      parameters:
+        - name: postID
+          in: path
+          required: true
+          description: ID do post
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Curtidas listadas com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Curtidas encontradas com sucesso."
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: "João Silva"
+                            username:
+                              type: string
+                              example: "joaosilva"
+                            profilePicture:
+                              type: string
+                              example: "https://example.com/profile.jpg"
+        '500':
+          description: Erro ao listar curtidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "erro ao listar curtidas"
+                  error:
+                    type: string
+                    example: "Erro interno do servidor"
+
+  /api/like:
+    post:
+      summary: Curtir um post
+      tags:
+        - Likes
+      description: Permite que um usuário curta um post. Verifica se o usuário e o post existem e se o usuário já curtiu o post.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userID:
+                  type: string
+                  example: "64f1b2b3c7e9b4f8f8f8f8f8"
+                postID:
+                  type: string
+                  example: "64f1b2b3c7e9b4f8f8f8f8f9"
+      responses:
+        '201':
+          description: Curtida adicionada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "curtida adicionada"
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "64f1b2b3c7e9b4f8f8f8f8f9"
+                      title:
+                        type: string
+                        example: "Meu primeiro post"
+        '400':
+          description: Usuário já curtiu o post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Você já curtiu esse post."
+        '404':
+          description: Usuário ou post não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Usuario ou post não encontrado!"
+        '500':
+          description: Erro ao curtir o post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "erro ao curtir o post"
+                  error:
+                    type: string
+                    example: "Erro interno do servidor"
+
+  /api/like/post/unlike:
+     delete:
+      summary: Remover curtida de um post
+      tags:
+        - Likes
+      description: Permite que um usuário remova a curtida de um post.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userID:
+                  type: string
+                  example: "67d097b028f6070cf4b45c5e"
+                postID:
+                  type: string
+                  example: "67d4df5fb760ce1f9cce2437"
+      responses:
+        '200':
+          description: Curtida removida com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "curtida removida"
+        '400':
+          description: Curtida não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Curtida não encontrada"
+        '500':
+          description: Erro ao remover curtida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "erro ao curtir"
+                  error:
+                    type: string
+                    example: "Erro interno do servidor"

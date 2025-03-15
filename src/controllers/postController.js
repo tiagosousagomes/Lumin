@@ -142,19 +142,25 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
   // Implementação para deletar um post
   try {
-    const posts = await Post.findByIdAndDelete(req.params.id);
+
+    const postID = req.params.id
+    console.log(postID)
+    const posts = await Post.findByIdAndDelete(postID);
     if (!posts) {
       res.status(400).json({
         success: false,
         message: "Post não encontrado",
       });
-      res.status(200).json({
-        sucess: false,
-        message: "Post deletado com sucesso!",
-      });
     }
+    res.status(200).json({
+      sucess: true,
+      message: "Post deletado com sucesso!",
+    });
   } catch (err) {
-    next(err);
+    res.status(500).json({
+      sucess: false,
+      err: err.message
+    });
   }
 };
 

@@ -49,7 +49,7 @@ const unlikePost = async (req, res) => {
   try {
     const { userID, postID } = req.body;
 
-    const like = await Like.findByIdAndDelete({ user: userID, post: postID });
+    const like = await Like.findOneAndDelete({ user: userID, post: postID });
 
     if (!like) {
       return res.status(400).json({
@@ -80,6 +80,15 @@ const getLikesByPost = async (req, res) => {
       "user",
       "name username profilePicture"
     );
+
+    if (likes.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "Este post não tem likes.",
+        data: [],
+      });
+    }
+
 
     res.status(200).json({
       success: true,
