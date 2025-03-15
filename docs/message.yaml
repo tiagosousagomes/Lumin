@@ -1,111 +1,111 @@
 paths:
-  /api/user:
+  /api/message:
     get:
-      summary: Lista todos os usuários
+      summary: Lista todas as mensagens
       tags:
-        - Users
+        - Messages
       responses:
         200:
-          description: Lista de usuários retornada com sucesso
+          description: Lista de mensagens retornada com sucesso
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/Message'
 
     post:
-      summary: Cria um novo usuário
+      summary: Cria uma nova mensagem
       tags:
-        - Users
+        - Messages
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Message'
       responses:
         201:
-          description: Usuário criado com sucesso
+          description: Mensagem criada com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Message'
 
-  /api/user/{id}:
+  /api/message/{id}:
     get:
-      summary: Retorna um usuário específico
+      summary: Retorna uma mensagem específica
       tags:
-        - Users
+        - Messages
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: ID do usuário
+          description: ID da mensagem
       responses:
         200:
-          description: Usuário encontrado com sucesso
+          description: Mensagem encontrada com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Message'
 
     put:
-      summary: Atualiza um usuário existente
+      summary: Atualiza uma mensagem existente
       tags:
-        - Users
+        - Messages
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: ID do usuário a ser atualizado
+          description: ID da mensagem a ser atualizada
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Message'
       responses:
         200:
-          description: Usuário atualizado com sucesso
+          description: Mensagem atualizada com sucesso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Message'
 
     delete:
-      summary: Deleta um usuário
+      summary: Deleta uma mensagem
       tags:
-        - Users
+        - Messages
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: ID do usuário a ser deletado
+          description: ID da mensagem a ser deletada
       responses:
         200:
-          description: Usuário deletado com sucesso
+          description: Mensagem deletada com sucesso
 
 components:
   schemas:
-    User:
+    Message:
       type: object
       properties:
-        name:
+        sender:
           type: string
-        email:
+        receiver:
           type: string
-        username:
+        content:
           type: string
-        bio:
+        sentAt:
           type: string
-        profilePicture:
+          format: date-time
+        readAt:
           type: string
-        password:
-          type: string
+          format: date-time

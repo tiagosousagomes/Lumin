@@ -7,6 +7,12 @@ paths:
       responses:
         200:
           description: Lista de posts retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
 
     post:
       summary: Cria um novo post
@@ -17,31 +23,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                content:
-                  type: string
+              $ref: '#/components/schemas/Post'
       responses:
         201:
           description: Post criado com sucesso
-
-  /api/post/user/{id}:
-    get:
-      summary: Lista posts de um usuário específico
-      tags:
-        - Posts
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: ID do usuário
-      responses:
-        200:
-          description: Lista de posts do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
 
   /api/post/{id}:
     get:
@@ -58,6 +47,10 @@ paths:
       responses:
         200:
           description: Post encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
 
     put:
       summary: Atualiza um post existente
@@ -75,15 +68,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                content:
-                  type: string
+              $ref: '#/components/schemas/Post'
       responses:
         200:
           description: Post atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
 
     delete:
       summary: Deleta um post
@@ -99,3 +91,25 @@ paths:
       responses:
         200:
           description: Post deletado com sucesso
+
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        author:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
