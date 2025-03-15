@@ -1,0 +1,81 @@
+paths:
+  /api/follower:
+    get:
+      summary: Lista todos os seguidores
+      tags:
+        - Followers
+      responses:
+        200:
+          description: Lista de seguidores retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Follower'
+
+    post:
+      summary: Cria um novo seguidor
+      tags:
+        - Followers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Follower'
+      responses:
+        201:
+          description: Seguidor criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follower'
+
+  /api/follower/{id}:
+    get:
+      summary: Retorna um seguidor específico
+      tags:
+        - Followers
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do seguidor
+      responses:
+        200:
+          description: Seguidor encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follower'
+
+    delete:
+      summary: Deleta um seguidor
+      tags:
+        - Followers
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do seguidor a ser deletado
+      responses:
+        200:
+          description: Seguidor deletado com sucesso
+
+components:
+  schemas:
+    Follower:
+      type: object
+      properties:
+        userId:
+          type: string
+        followerId:
+          type: string
+        followedAt:
+          type: string
+          format: date-time

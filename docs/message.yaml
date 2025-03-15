@@ -1,0 +1,111 @@
+paths:
+  /api/message:
+    get:
+      summary: Lista todas as mensagens
+      tags:
+        - Messages
+      responses:
+        200:
+          description: Lista de mensagens retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+
+    post:
+      summary: Cria uma nova mensagem
+      tags:
+        - Messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        201:
+          description: Mensagem criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /api/message/{id}:
+    get:
+      summary: Retorna uma mensagem específica
+      tags:
+        - Messages
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID da mensagem
+      responses:
+        200:
+          description: Mensagem encontrada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+    put:
+      summary: Atualiza uma mensagem existente
+      tags:
+        - Messages
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID da mensagem a ser atualizada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        200:
+          description: Mensagem atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+    delete:
+      summary: Deleta uma mensagem
+      tags:
+        - Messages
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID da mensagem a ser deletada
+      responses:
+        200:
+          description: Mensagem deletada com sucesso
+
+components:
+  schemas:
+    Message:
+      type: object
+      properties:
+        sender:
+          type: string
+        receiver:
+          type: string
+        content:
+          type: string
+        sentAt:
+          type: string
+          format: date-time
+        readAt:
+          type: string
+          format: date-time

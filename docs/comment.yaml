@@ -1,0 +1,111 @@
+paths:
+  /api/comment:
+    get:
+      summary: Lista todos os comentários
+      tags:
+        - Comments
+      responses:
+        200:
+          description: Lista de comentários retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+
+    post:
+      summary: Cria um novo comentário
+      tags:
+        - Comments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        201:
+          description: Comentário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+  /api/comment/{id}:
+    get:
+      summary: Retorna um comentário específico
+      tags:
+        - Comments
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do comentário
+      responses:
+        200:
+          description: Comentário encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+    put:
+      summary: Atualiza um comentário existente
+      tags:
+        - Comments
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do comentário a ser atualizado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        200:
+          description: Comentário atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+    delete:
+      summary: Deleta um comentário
+      tags:
+        - Comments
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do comentário a ser deletado
+      responses:
+        200:
+          description: Comentário deletado com sucesso
+
+components:
+  schemas:
+    Comment:
+      type: object
+      properties:
+        postId:
+          type: string
+        userId:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
