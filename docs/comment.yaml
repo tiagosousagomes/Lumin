@@ -1,111 +1,95 @@
+swagger: '2.0'
+info:
+  title: Comment API
+  description: API para gerenciamento de comentários
+  version: 1.0.0
+tags:
+  - name: Comment
+    description: Operações relacionadas a comentários
 paths:
-  /api/comment:
+  /api/comment/post/{Id}:
     get:
-      summary: Lista todos os comentários
       tags:
-        - Comments
+        - Comment
+      summary: Retorna todos os comentários de um post específico
+      description: Retorna uma lista de comentários associados a um post pelo ID do post.
+      parameters:
+        - name: Id
+          in: path
+          description: ID do post
+          required: true
+          type: string
       responses:
-        200:
+        '200':
           description: Lista de comentários retornada com sucesso
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Comment'
-
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Comment'
+        '404':
+          description: Post não encontrado
+        '500':
+          description: Erro interno do servidor
+  /api/comment/:
     post:
+      tags:
+        - Comment
       summary: Cria um novo comentário
-      tags:
-        - Comments
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Comment'
+      description: Cria um novo comentário com os dados fornecidos.
+      parameters:
+        - name: comment
+          in: body
+          description: Objeto do comentário
+          required: true
+          schema:
+            $ref: '#/definitions/Comment'
       responses:
-        201:
+        '201':
           description: Comentário criado com sucesso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-
+        '400':
+          description: Dados inválidos fornecidos
+        '500':
+          description: Erro interno do servidor
   /api/comment/{id}:
-    get:
-      summary: Retorna um comentário específico
-      tags:
-        - Comments
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: ID do comentário
-      responses:
-        200:
-          description: Comentário encontrado com sucesso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-
-    put:
-      summary: Atualiza um comentário existente
-      tags:
-        - Comments
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: ID do comentário a ser atualizado
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Comment'
-      responses:
-        200:
-          description: Comentário atualizado com sucesso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-
     delete:
-      summary: Deleta um comentário
       tags:
-        - Comments
+        - Comment
+      summary: Deleta um comentário
+      description: Deleta um comentário pelo ID.
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
+          description: ID do comentário
           required: true
-          schema:
-            type: string
-          description: ID do comentário a ser deletado
+          type: string
       responses:
-        200:
+        '200':
           description: Comentário deletado com sucesso
-
-components:
-  schemas:
-    Comment:
-      type: object
-      properties:
-        postId:
-          type: string
-        userId:
-          type: string
-        content:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
+        '404':
+          description: Comentário não encontrado
+        '500':
+          description: Erro interno do servidor
+definitions:
+  Comment:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ID do comentário
+      postId:
+        type: string
+        description: ID do post associado ao comentário
+      userId:
+        type: string
+        description: ID do usuário que fez o comentário
+      content:
+        type: string
+        description: Conteúdo do comentário
+      createdAt:
+        type: string
+        format: date-time
+        description: Data de criação do comentário
+    required:
+      - postId
+      - userId
+      - content

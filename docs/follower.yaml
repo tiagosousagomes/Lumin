@@ -1,81 +1,166 @@
+swagger: '2.0'
+info:
+  title: Follower API
+  description: API para gerenciamento de seguidores e usuários seguidos
+  version: 1.0.0
+basePath: /api
+schemes:
+  - http
+  - https
+tags:
+  - name: Follower
+    description: Operações relacionadas a seguidores e usuários seguidos
 paths:
-  /api/follower:
-    get:
-      summary: Lista todos os seguidores
+  /api/follow:
+    post:
       tags:
-        - Followers
+        - Follower
+      summary: Seguir um usuário
+      description: Segue um usuário com base nos IDs do seguidor e do usuário a ser seguido.
+      parameters:
+        - in: body
+          name: body
+          description: IDs do seguidor e do usuário a ser seguido
+          required: true
+          schema:
+            type: object
+            required:
+              - followerID
+              - followingID
+            properties:
+              followerID:
+                type: string
+                description: ID do seguidor
+              followingID:
+                type: string
+                description: ID do usuário a ser seguido
       responses:
-        200:
+        '201':
+          description: Usuário seguido com sucesso
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: "Usuário seguido com sucesso"
+        '400':
+          description: Usuário já está sendo seguido
+        '404':
+          description: Usuário não encontrado
+        '500':
+          description: Erro interno do servidor
+    delete:
+      tags:
+        - Follower
+      summary: Deixar de seguir um usuário
+      description: Deixa de seguir um usuário com base nos IDs do seguidor e do usuário a ser deixado de seguir.
+      parameters:
+        - in: body
+          name: body
+          description: IDs do seguidor e do usuário a ser deixado de seguir
+          required: true
+          schema:
+            type: object
+            required:
+              - followerID
+              - followingID
+            properties:
+              followerID:
+                type: string
+                description: ID do seguidor
+              followingID:
+                type: string
+                description: ID do usuário a ser deixado de seguir
+      responses:
+        '200':
+          description: Usuário deixado de seguir com sucesso
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: "Você deixou de seguir este usuário"
+        '404':
+          description: Você não segue este usuário
+        '500':
+          description: Erro interno do servidor
+  /api/followers/{userID}:
+    get:
+      tags:
+        - Follower
+      summary: Obter seguidores de um usuário
+      description: Retorna a lista de seguidores de um usuário específico.
+      parameters:
+        - name: userID
+          in: path
+          description: ID do usuário
+          required: true
+          type: string
+      responses:
+        '200':
           description: Lista de seguidores retornada com sucesso
-          content:
-            application/json:
-              schema:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: "Seguidores encontrados"
+              followers:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Follower'
-
-    post:
-      summary: Cria um novo seguidor
-      tags:
-        - Followers
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Follower'
-      responses:
-        201:
-          description: Seguidor criado com sucesso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Follower'
-
-  /api/follower/{id}:
+                  $ref: '#/definitions/User'
+        '500':
+          description: Erro interno do servidor
+  /api/following/{userID}:
     get:
-      summary: Retorna um seguidor específico
       tags:
-        - Followers
+        - Follower
+      summary: Obter usuários seguidos por um usuário
+      description: Retorna a lista de usuários seguidos por um usuário específico.
       parameters:
-        - in: path
-          name: id
+        - name: userID
+          in: path
+          description: ID do usuário
           required: true
-          schema:
-            type: string
-          description: ID do seguidor
+          type: string
       responses:
-        200:
-          description: Seguidor encontrado com sucesso
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Follower'
-
-    delete:
-      summary: Deleta um seguidor
-      tags:
-        - Followers
-      parameters:
-        - in: path
-          name: id
-          required: true
+        '200':
+          description: Lista de usuários seguidos retornada com sucesso
           schema:
-            type: string
-          description: ID do seguidor a ser deletado
-      responses:
-        200:
-          description: Seguidor deletado com sucesso
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: "Lista de usuários seguidos recuperada com sucesso"
+              following:
+                type: array
+                items:
+                  $ref: '#/definitions/User'
+        '500':
+          description: Erro interno do servidor
 
-components:
-  schemas:
-    Follower:
-      type: object
-      properties:
-        userId:
-          type: string
-        followerId:
-          type: string
-        followedAt:
-          type: string
-          format: date-time
+definitions:
+  User:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome do usuário
+      username:
+        type: string
+        description: Nome de usuário
+      profilePicture:
+        type: string
+        description: URL da foto de perfil
