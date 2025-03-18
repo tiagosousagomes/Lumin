@@ -10,7 +10,7 @@ const followUser = async (req, res) => {
 
     if (!follower || !following) {
       return res.status(404).json({
-        succsess: false,
+        success: false,
         message: "Usuário não encontrado",
       });
     }
@@ -22,7 +22,7 @@ const followUser = async (req, res) => {
 
     if (existingFollow) {
       return res.status(400).json({
-        succsess: false,
+        success: false,
         message: "Usuário já está seguindo",
       });
     }
@@ -35,12 +35,12 @@ const followUser = async (req, res) => {
     await follow.save();
 
     res.status(201).json({
-      succsess: true,
+      success: true,
       message: "Usuário seguido com sucesso",
     });
   } catch (err) {
     res.status(500).json({
-      succsess: false,
+      success: false,
       message: "Erro ao seguir usuário",
     });
   }
@@ -57,18 +57,18 @@ const unfollowUser = async (req, res) => {
 
     if (!follow) {
       return res.status(404).json({
-        succsess: false,
+        success: false,
         message: "Você não segue este usuário",
       });
     }
 
     res.status(200).json({
-      succsess: true,
+      success: true,
       message: "Você deixou de seguir este usuário",
     });
   } catch (err) {
     res.status(500).json({
-      succsess: false,
+      success: false,
       message: "Erro ao deixar de seguir usuário",
     });
   }
@@ -84,13 +84,13 @@ const getFollowers = async (req, res) => {
     );
 
     res.status(200).json({
-      succsess: true,
+      success: true,
       message: "Seguidores encontrados",
       followers: followers,
     });
   } catch (err) {
     res.status(500).json({
-      succsess: false,
+      success: false,
       message: "Erro ao buscar seguidores",
     });
   }
@@ -106,13 +106,13 @@ const getFollowing = async (req, res) => {
     );
 
     res.status(200).json({
-      succsess: true,
+      success: true,
       message: "Lista de usuários seguidos recuperada com sucesso",
       following: following,
     });
   } catch (err) {
     res.status(500).json({
-      succsess: false,
+      success: false,
       message: "Erro ao buscar lista de usuários",
     });
   }

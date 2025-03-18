@@ -64,7 +64,7 @@ const getUserById = async (req, res, next) => {
 
     console.log(users);
     if (!users) {
-      res.status(404).json({
+     return res.status(404).json({
         success: false,
         message: "Usuario não encontrado",
       });
@@ -109,7 +109,7 @@ const deleteUser = async (req, res, next) => {
   try {
     const users = await User.findByIdAndDelete(req.params.id);
     if (!users) {
-      res.stauts(400).json({
+      res.status(400).json({
         success: false,
         message: "Usuario não encontrado!",
       });

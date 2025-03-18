@@ -1,10 +1,10 @@
 const Message = require("../models/messages");
 const User = require("../models/user");
 const crypto = require("crypto");
-
+require("dotenv").config()
 // SISTEMA PARA CRIPTOGRAFIA DE MENSAGENS
 
-const SECRET_KEY = "minha_senha_e_admin_123";
+const SECRET_KEY = process.env.SECRET_KEY
 const ALGORITHM = "aes-256-cbc"; // utilizei o algoritimo que já crip, e descrip
 
 const encryptMessage = (message) => {
@@ -57,8 +57,8 @@ const sendMessage = async (req, res) => {
       data: message,
     });
   } catch (err) {
-    next(err);
-  }
+    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+}
 };
 
 const markMessageAsRead = async (req, res, next) => {
@@ -84,8 +84,8 @@ const markMessageAsRead = async (req, res, next) => {
       data: message,
     });
   } catch (err) {
-    next(err);
-  }
+    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+}
 };
 
 const getMessages = async (req, res) => {
@@ -110,8 +110,8 @@ const getMessages = async (req, res) => {
       data: decryptedMessages,
     });
   } catch (err) {
-    next(err);
-  }
+    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+}
 };
 
 const deleteMessage = async (req, res) => {
@@ -147,8 +147,8 @@ const deleteMessage = async (req, res) => {
       message: "Mensagem excluída com sucesso",
     });
   } catch (err) {
-    next(err);
-  }
+    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+}
 };
 
 module.exports = {

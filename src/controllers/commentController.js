@@ -24,7 +24,7 @@ const createComment = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "comentario adicionado",
-      data: post,
+      data: comment, 
     });
   } catch (err) {
     res.status(500).json({

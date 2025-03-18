@@ -49,7 +49,7 @@ const getAllPosts = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      success: true,
+      success: false,
       message: "erro ao listar os posts:",
     });
   }
@@ -82,7 +82,7 @@ const getAllPostFromUser = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      success: true,
+      success: false,
       message: "erro ao listar o post de um usuario:",
     });
   }
@@ -106,7 +106,9 @@ const getPostById = async (req, res) => {
       message: "Post do ID:",
       data: posts,
     });
-  } catch {}
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+}
 };
 
 const updatePost = async (req, res) => {
@@ -133,7 +135,7 @@ const updatePost = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      success: true,
+      success: false,
       message: "erro ao atualizar o post:",
     });
   }

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 class Database {
   constructor(connectionString) {
     if (!connectionString) {
-      throw new error("Connection is a required!");
+      throw new Error("Connection is a required!");
     }
     this.connectionString = connectionString;
     this.connection = null;
