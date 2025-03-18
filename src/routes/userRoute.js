@@ -6,8 +6,8 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 router.post("/login", userAuthenticator);
-router.post("/refresh-token", refreshTokenHandler); // Nova rota para renovar token
-router.post("/logout", logoutUser); // Nova rota para logout
+router.post("/refresh-token", refreshTokenHandler); 
+router.post("/logout", logoutUser); 
 
 router.get("/user/", authMiddleware, userController.getAllUser);
 router.get("/user/:id", authMiddleware, userController.getUserById);
