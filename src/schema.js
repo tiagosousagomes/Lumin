@@ -33,7 +33,7 @@ const PostType = new GraphQLObjectType({
     })
   });
   
-  // Definindo o tipo User (simplificado)
+  // Definindo o tipo User
   const UserType = new GraphQLObjectType({
     name: 'User',
     fields: () => ({
@@ -44,7 +44,7 @@ const PostType = new GraphQLObjectType({
     })
   });
 
-  // Definindo o tipo Comment (simplificado)
+  // Definindo o tipo Comment
 const CommentType = new GraphQLObjectType({
     name: 'Comment',
     fields: () => ({
@@ -62,12 +62,14 @@ const CommentType = new GraphQLObjectType({
   const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
+      // Query para buscar todos os posts
       posts: {
         type: new GraphQLList(PostType),
         resolve(parent, args) {
           return Post.find();
         }
       },
+      // Query para buscar um post por ID
       post: {
         type: PostType,
         args: { id: { type: GraphQLID } },
@@ -75,6 +77,7 @@ const CommentType = new GraphQLObjectType({
           return Post.findById(args.id);
         }
       },
+      // Query para buscar um post por usuáirio, utilizando o ID do usuário
       postsByUser: {
         type: new GraphQLList(PostType),
         args: { userId: { type: GraphQLID } },
@@ -88,6 +91,7 @@ const CommentType = new GraphQLObjectType({
   const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
+      // Mutation para criar um novo post
       createPost: {
         type: PostType,
         args: {
@@ -106,6 +110,7 @@ const CommentType = new GraphQLObjectType({
           return post.save();
         }
       },
+      // Mutation para atualizar um post
       updatePost: {
         type: PostType,
         args: {
@@ -116,6 +121,7 @@ const CommentType = new GraphQLObjectType({
           return Post.findByIdAndUpdate(args.id, { content: args.content }, { new: true });
         }
       },
+      // Mutation para deletar um post
       deletePost: {
         type: PostType,
         args: { id: { type: new GraphQLNonNull(GraphQLID) } },

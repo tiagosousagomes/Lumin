@@ -17,7 +17,6 @@ mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log('Banco de dados conectado com sucesso!');
 
-        // Endpoint GraphQL
         app.use('/graphql', graphqlHTTP({
             schema,
             graphiql: true
