@@ -4,15 +4,35 @@ let postSchema = new mongoose.Schema({
   content: {
     type: String,
     required: [true, "o conteudo da publicação é obrigatorio"],
-    minlenght: [1, "o conteudo não pode estar vazio"],
+    minlength: [1, "o conteudo não pode estar vazio"],
   },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "user", default: [] }],
-  comments: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: [] },
-  ],
-  createAt: { type: Date, default: Date.now },
-  updateAt: { type: Date, default: Date.now },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true
+  },
+  image: {
+    data: Buffer,
+    contentType: String
+  },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    default: []
+  }],
+  comments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "comment",
+    default: []
+  }, ],
+  createAt: {
+    type: Date,
+    default: Date.now
+  },
+  updateAt: {
+    type: Date,
+    default: Date.now
+  },
 });
 
 postSchema.pre("save", function (next) {

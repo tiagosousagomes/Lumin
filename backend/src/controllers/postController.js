@@ -1,11 +1,24 @@
 const Post = require("../models/post");
 const User = require("../models/user");
+const multer = require("multer");
+
+// Configuração do multer para armazenar a imagem na memória
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  } 
+});
 
 const createPost = async (req, res) => {
   try {
-    const { content, author } = req.body;
+    const {
+      content,
+      author
+    } = req.body;
+    const image = req.file;
 
-    // Verifica se o autor existe
     const user = await User.findById(author);
     if (!user) {
       return res.status(404).json({
@@ -14,13 +27,15 @@ const createPost = async (req, res) => {
       });
     }
 
-    // Cria o post
     const post = new Post({
       content,
       author,
+      image: image ? {
+        data: image.buffer,
+        contentType: image.mimetype
+      } : undefined,
     });
 
-    // Salva o post no banco de dados
     await post.save();
 
     res.status(201).json({
@@ -37,138 +52,234 @@ const createPost = async (req, res) => {
   }
 };
 
+// Listar todos os posts
 const getAllPosts = async (req, res) => {
-  // Implementação para listar todos os posts
-
   try {
-    const posts = await Post.find().sort({ createAt: -1 });
-    res.status(201).json({
+    const posts = await Post.find()
+      .sort({
+        createAt: -1
+      })
+      .populate("author", "name username profilePicture")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "author",
+          select: "name username profilePicture"
+        }
+      });
+
+    res.status(200).json({
       success: true,
-      message: "Lista de Post:",
+      message: "Lista de Posts:",
       data: posts,
     });
   } catch (err) {
     res.status(500).json({
-      success: true,
-      message: "erro ao listar os posts:",
+      success: false,
+      message: "Erro ao listar os posts:",
+      error: err.message
     });
   }
 };
 
+// Obter todos os posts de um usuário
 const getAllPostFromUser = async (req, res) => {
-  //Implementação para obter todos os posts de um user
-
   try {
     const userID = req.params.id;
 
     const user = await User.findById(userID);
-
     if (!user) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
-        message: "usuario não encontrado",
+        message: "Usuário não encontrado",
       });
     }
-    const posts = await Post.find({ author: userID }).populate(
-      "author",
-      "name username profilePicture"
-    );
 
-    console.log(posts);
-    res.status(201).json({
+    const posts = await Post.find({
+        author: userID
+      })
+      .sort({
+        createAt: -1
+      })
+      .populate("author", "name username profilePicture")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "author",
+          select: "name username profilePicture"
+        }
+      });
+
+    res.status(200).json({
       success: true,
-      message: "posts do usuario:",
+      message: "Posts do usuário:",
       data: posts,
     });
   } catch (err) {
     res.status(500).json({
-      success: true,
-      message: "erro ao listar o post de um usuario:",
+      success: false,
+      message: "Erro ao listar os posts de um usuário:",
+      error: err.message
     });
   }
 };
 
+// Obter um post por ID
 const getPostById = async (req, res) => {
-  // Implementação para obter um post por ID
-
   try {
     const postID = req.params.id;
+    const post = await Post.findById(postID)
+      .populate("author", "name username profilePicture")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "author",
+          select: "name username profilePicture"
+        }
+      });
 
-    const posts = await Post.findById(postID);
-    if (!posts) {
-      res.status(400).json({
+    if (!post) {
+      return res.status(404).json({
         success: false,
-        message: "post não encontrado!",
+        message: "Post não encontrado!",
       });
     }
+
     res.status(200).json({
       success: true,
-      message: "Post do ID:",
-      data: posts,
-    });
-  } catch {}
-};
-
-const updatePost = async (req, res) => {
-  // Implementação para atualizar um post
-  try {
-    const { content } = req.body;
-
-    const posts = await Post.findByIdAndUpdate(
-      req.params.id,
-      { content },
-      { new: true, runValidators: true }
-    );
-    if (!posts) {
-      res.status(400),
-        json({
-          success: false,
-          message: "Post não encontrado!",
-        });
-    }
-    res.status(200).json({
-      success: true,
-      message: "post atualizado com sucesso",
-      data: posts,
+      message: "Post encontrado:",
+      data: post,
     });
   } catch (err) {
     res.status(500).json({
-      success: true,
-      message: "erro ao atualizar o post:",
+      success: false,
+      message: "Erro ao buscar o post:",
+      error: err.message
     });
   }
 };
 
-const deletePost = async (req, res) => {
-  // Implementação para deletar um post
+// Atualizar um post
+const updatePost = async (req, res) => {
   try {
+    const {
+      content
+    } = req.body;
+    const image = req.file;
 
-    const postID = req.params.id
-    console.log(postID)
-    const posts = await Post.findByIdAndDelete(postID);
-    if (!posts) {
-      res.status(400).json({
+    const updateData = {
+      content,
+      updateAt: Date.now() // Atualiza a data de atualização
+    };
+
+    if (image) {
+      updateData.image = {
+        data: image.buffer,
+        contentType: image.mimetype
+      };
+    }
+
+    const post = await Post.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    }).populate("author", "name username profilePicture");
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post não encontrado!",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Post atualizado com sucesso",
+      data: post,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao atualizar o post:",
+      error: err.message
+    });
+  }
+};
+
+// Deletar um post
+const deletePost = async (req, res) => {
+  try {
+    const postID = req.params.id;
+    const post = await Post.findByIdAndDelete(postID);
+
+    if (!post) {
+      return res.status(404).json({
         success: false,
         message: "Post não encontrado",
       });
     }
+
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "Post deletado com sucesso!",
     });
   } catch (err) {
     res.status(500).json({
-      sucess: false,
-      err: err.message
+      success: false,
+      message: "Erro ao deletar o post",
+      error: err.message,
+    });
+  }
+};
+
+// Adicionar rota para curtir/descurtir um post
+const likePost = async (req, res) => {
+  try {
+    const postID = req.params.id;
+    const userID = req.body.userId;
+
+    // Verifica se o post existe
+    const post = await Post.findById(postID);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post não encontrado"
+      });
+    }
+
+    // Verifica se o usuário já curtiu o post
+    const index = post.likes.indexOf(userID);
+
+    if (index === -1) {
+      // Adiciona o like
+      post.likes.push(userID);
+    } else {
+      // Remove o like (descurtir)
+      post.likes.splice(index, 1);
+    }
+
+    await post.save();
+
+    res.status(200).json({
+      success: true,
+      message: index === -1 ? "Post curtido com sucesso" : "Post descurtido com sucesso",
+      liked: index === -1,
+      likesCount: post.likes.length
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao processar a curtida",
+      error: err.message
     });
   }
 };
 
 module.exports = {
-  createPost,
+  createPost: [upload.single("image"), createPost],
   getAllPosts,
   getAllPostFromUser,
   getPostById,
-  updatePost,
+  updatePost: [upload.single("image"), updatePost],
   deletePost,
+  likePost
 };

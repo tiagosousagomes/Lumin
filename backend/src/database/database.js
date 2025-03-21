@@ -12,7 +12,7 @@ class Database {
   async connect() {
     try {
       await mongoose.connect(this.connectionString, {
-        useNewUrlParser: true, //evita aviso de depreciação
+        useNewUrlParser: true,  
         useUnifiedTopology: true,
       });
       console.log("Database Connect!");
