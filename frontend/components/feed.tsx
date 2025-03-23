@@ -9,6 +9,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
+
+interface Post{
+  content:string,
+  author:string,
+  image:string,
+  likes:[],
+  comments:[]
+}
+
+interface responsePost{
+  data:Post[]
+}
 interface FeedProps {
   className?: string;
 }
@@ -18,8 +30,8 @@ export function Feed({ className }: FeedProps) {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/post") // Ajuste o endpoint conforme necessário
-      .then((res) => res.json())
+    const data = await fetch("http://localhost:3001/api/post") // Ajuste o endpoint conforme necessário
+      .then((data) => data.json())
       .then((data) => setPosts(Array.isArray(data.data) ? data.data : []))
       .catch((err) => console.error("Erro ao buscar posts:", err));
   }, []);
