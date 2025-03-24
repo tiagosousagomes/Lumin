@@ -30,7 +30,7 @@ export function Feed({ className }: FeedProps) {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    const data = await fetch("http://localhost:3001/api/post") // Ajuste o endpoint conforme necessário
+    const data = fetch("http://localhost:3001/api/post")
       .then((data) => data.json())
       .then((data) => setPosts(Array.isArray(data.data) ? data.data : []))
       .catch((err) => console.error("Erro ao buscar posts:", err));
