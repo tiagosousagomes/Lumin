@@ -39,24 +39,20 @@ interface User{
   _id: string;
   name: string;
   username: string;
-  avatar?: string; 
-  email: string; 
-  password:string; //falta adicionar followers e following
-  
+  email: string;   
 }
 interface Post {
   _id: string;
   content: string;
-  image?:string;
   author: User;
   likes: Like[];
   comments: Comments[];
 }
 
 interface responsePost {
-  sucess: boolean;
+  success: boolean;
   message?: string;
-  data: Post[] | Post;
+  data: Post[];
 }
 interface FeedProps {
   className?: string;
@@ -72,7 +68,7 @@ export function Feed({ className }: FeedProps) {
         const response = await fetch("http://localhost:3001/api/post"); // Ajuste o endpoint conforme necessário
         const data: responsePost = await response.json();
 
-        if (data.sucess && Array.isArray(data.data)) {
+        if (data.success && Array.isArray(data.data)) {
           setPosts(data.data);
         } else {
           console.error("Formato de dados inesperado:", data);
@@ -82,8 +78,9 @@ export function Feed({ className }: FeedProps) {
       }
     };
     fetchResponse();
-  });
+  }, []);
 
+  
   return (
     <div className={cn("space-y-4", className)}>
       <Card className="border-gray-800 bg-[#2a2b2d]">
@@ -118,12 +115,11 @@ export function Feed({ className }: FeedProps) {
 
       <div className="space-y-4">
         {posts.map((post) => (
-          <Card key={post.author._id} className="border-gray-800 bg-[#2a2b2d]">
+          <Card key={post._id} className="border-gray-800 bg-[#2a2b2d]">
             <CardHeader className="flex-row items-start gap-4 space-y-0 pb-2">
               <Avatar>
                 <AvatarImage
-                  src={post.author.avatar || "/default-avatar.png"}
-                  alt={post.author.username || "Usuário desconhecido"}
+                  alt={post.author?.username || "Usuário desconhecido"}
                 />
                 <AvatarFallback>
                   {post.author?.name ? post.author.name[0] : "?"}
@@ -152,19 +148,7 @@ export function Feed({ className }: FeedProps) {
               </div>
             </CardHeader>  
             <CardContent className="pb-2 pt-0">
-              {post.image && post.image && ( 
-                <div className="mt-3 overflow-hidden rounded-xl"> 
-                  <Image
-                    src={`data:${post.image};base64,${Buffer.from(
-                      post.image
-                    ).toString("base64")}`}
-                    alt="Post attachment"
-                    className="h-auto w-full object-cover"
-                    width={500}
-                    height={500}
-                  />
-                </div>
-              )}
+              
             </CardContent>
             <CardFooter className="flex justify-between py-2">
               <Button
@@ -205,7 +189,7 @@ export function Feed({ className }: FeedProps) {
     </div>
   );
 }
-// passo 1: determinar os dados da interface igual o do schema do banco de dados (./backend/src/models)
+// passo 1: determinar os dados da interface igual o do schema do banco de dados (./backend/src/models) (ok)
 // passo 2: verificar como os dados está saindo das rota de post, dar um try catch na rota pra verificar 
 // passo 3: pegar os dados da api e usar com a interface que você criou
 // passo 4: tirar todo o schema de follow e colocar ele dentro de User (mas espera o grupo decidir antes)
