@@ -1,5 +1,7 @@
 let mongoose = require("mongoose");
-const { type } = require("os");
+const {
+	type
+} = require("os");
 
 
 let userSchema = new mongoose.Schema({
@@ -52,14 +54,14 @@ let userSchema = new mongoose.Schema({
 		},
 	},
 	follower: {
-	type: mongoose.Schema.Types.ObjectId,
-	ref: "user",
-	required: true,
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "user",
+		required: true,
 	},
 	following: {
-	type: mongoose.Schema.Types.ObjectId,
-	ref: "user",
-	required: true,
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "user",
+		required: true,
 	},
 });
 

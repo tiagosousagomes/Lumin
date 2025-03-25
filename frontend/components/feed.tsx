@@ -24,12 +24,14 @@ import Image from "next/image";
 interface Like {
   _id: string;
   user: User | string; // Pode ser o objeto completo ou apenas o ID
+  post: Post | string;
   createdAt: Date;
 }
 interface Comments{
   _id: string;
   content: string;
   author: User | string; // Pode ser o objeto completo ou apenas o ID
+  post: Post | string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +45,7 @@ interface User{
   
 }
 interface Post {
+  _id: string;
   content: string;
   image?:string;
   author: User;

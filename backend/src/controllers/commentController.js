@@ -3,61 +3,74 @@ const User = require("../models/user");
 const Post = require("../models/post");
 
 const createComment = async (req, res) => {
-  try {
-    const { userID, postID, content } = req.body;
+	try {
+		const {
+			userID,
+			postID,
+			content
+		} = req.body;
 
-    console.log({ userID, postID });
+		console.log({
+			userID,
+			postID
+		});
 
-    const user = await User.findById(userID);
-    const post = await Post.findById(postID);
+		const user = await User.findById(userID);
+		const post = await Post.findById(postID);
 
-    if (!user || !post) {
-      return res.status(404).json({
-        success: false,
-        message: "Usuario ou post não encontrado!",
-      });
-    }
+		if (!user || !post) {
+			return res.status(404).json({
+				success: false,
+				message: "Usuario ou post não encontrado!",
+			});
+		}
 
-    const comment = new Comment({ author: userID, post: postID, content });
-    await comment.save();
+		const comment = new Comment({
+			author: userID,
+			post: postID,
+			content
+		});
+		await comment.save();
 
-    res.status(201).json({
-      success: true,
-      message: "comentario adicionado",
-      data: post,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "erro ao adicionar comentario",
-      error: err.message,
-    });
-  }
+		res.status(201).json({
+			success: true,
+			message: "comentario adicionado",
+			data: post,
+		});
+	} catch (err) {
+		res.status(500).json({
+			success: false,
+			message: "erro ao adicionar comentario",
+			error: err.message,
+		});
+	}
 };
 
 const getCommentsByPost = async (req, res) => {
-  try {
-    const postID = req.params.postID;
+	try {
+		const postID = req.params.postID;
 
-    const comment = await Comment.find({ post: postID }).populate(
-      "author",
-      "name username profilePicture"
-    );
+		const comment = await Comment.find({
+			post: postID
+		}).populate(
+			"author",
+			"name username profilePicture"
+		);
 
-    console.log(comment);
+		console.log(comment);
 
-    res.status(200).json({
-      success: true,
-      message: "comentarios encontradas com sucesso.",
-      data: comment,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "erro ao listar comentarios",
-      error: err.message,
-    });
-  }
+		res.status(200).json({
+			success: true,
+			message: "comentarios encontradas com sucesso.",
+			data: comment,
+		});
+	} catch (err) {
+		res.status(500).json({
+			success: false,
+			message: "erro ao listar comentarios",
+			error: err.message,
+		});
+	}
 };
 
 /* 
@@ -93,32 +106,34 @@ const updateComment = async (req, res) => {
 };
 */
 const deleteComment = async (req, res) => {
-  try {
-    const { commentID } = req.params;
+	try {
+		const {
+			commentID
+		} = req.params;
 
-    const comment = await Comment.findByIdAndDelete(commentID);
-    if (!comment) {
-      return res.status(404).json({
-        success: false,
-        message: "Comentário não encontrado",
-      });
-    }
+		const comment = await Comment.findByIdAndDelete(commentID);
+		if (!comment) {
+			return res.status(404).json({
+				success: false,
+				message: "Comentário não encontrado",
+			});
+		}
 
-    res.status(200).json({
-      success: true,
-      message: "Comentário deletado com sucesso",
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Erro ao  deletar comentário",
-      error: err.message,
-    });
-  }
+		res.status(200).json({
+			success: true,
+			message: "Comentário deletado com sucesso",
+		});
+	} catch (err) {
+		res.status(500).json({
+			success: false,
+			message: "Erro ao  deletar comentário",
+			error: err.message,
+		});
+	}
 };
 
 module.exports = {
-  createComment,
-  getCommentsByPost,
-  deleteComment,
+	createComment,
+	getCommentsByPost,
+	deleteComment,
 };
