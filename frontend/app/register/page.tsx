@@ -65,14 +65,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F7FFF7] p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#222325] p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#1A535C]">Lumin</h1>
+          <h1 className="text-3xl font-bold text-[#4B7CCC]">Lumin</h1>
           <p className="mt-2 text-gray-400">Crie sua conta e conecte-se</p>
         </div>
 
-        <Card className="border-gray-800 bg-[#1A535C]">
+        <Card className="border-gray-800 bg-[#2a2b2d]">
           <CardHeader className="mt-2">
             <CardTitle className="text-xl text-white">Criar Conta</CardTitle>
             <CardDescription className="text-gray-400">Preencha os dados abaixo para se cadastrar</CardDescription>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
                     id="name"
                     type="text"
                     placeholder="Nome Completo"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#FFFFFF]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
@@ -109,7 +109,7 @@ export default function RegisterPage() {
                     id="username"
                     type="text"
                     placeholder="Username"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#FFFFFF]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ""))}
                     required
@@ -127,7 +127,7 @@ export default function RegisterPage() {
                     id="email"
                     type="email"
                     placeholder="Email"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#FFFFFF]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -145,7 +145,7 @@ export default function RegisterPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 pr-10 text-black placeholder:text-gray-500 focus-visible:ring-[#FFFFFF]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 pr-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -170,7 +170,7 @@ export default function RegisterPage() {
                     id="confirmPassword"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#FFFFFF]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -178,13 +178,13 @@ export default function RegisterPage() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4 p-6">
-              <Button type="submit" className="w-full bg-[#FFFFFF] text-[1A535C] hover:bg-[#FFFFFF]/90" disabled={loading}>
+            <CardFooter className="flex flex-col space-y-3 p-5">
+              <Button type="submit" className="w-50 bg-[#FFFFFF] text-[1A535C] hover:bg-[#4B7CCC]/90" disabled={loading}>
                 {loading ? "Criando conta..." : "Criar Conta"}
               </Button>
               <p className="text-center text-sm text-white">
                 Já tem uma conta?{" "}
-                <Link href="/login" className="text-[#FFD166] hover:underline">
+                <Link href="/login" className="text-[#4B7CCC] hover:underline">
                   Entrar
                 </Link>
               </p>

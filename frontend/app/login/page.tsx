@@ -34,14 +34,14 @@ export  default function LoginPage() {
   
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F7FFF7] p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#222325] p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0D1B2A]">Lumin</h1>
+          <h1 className="text-3xl font-bold text-[#4B7CCC]">Lumin</h1>
           <p className="mt-2 text-gray-700">Conecte-se com o mundo</p>
         </div>
 
-        <Card className="border-gray-800 bg-[#1A535C]"> 
+        <Card className="border-gray-800 bg-[#2a2b2d]"> 
           <CardHeader>
             <CardTitle className="text-xl text-white">Entrar</CardTitle>
             <CardDescription className="text-gray-400">Entre com sua conta para continuar</CardDescription>
@@ -58,7 +58,7 @@ export  default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="email"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#FFFFFF]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -71,7 +71,7 @@ export  default function LoginPage() {
                   <Label htmlFor="password" className="text-white">
                     Senha
                   </Label>
-                  <Link href="/login/forgot-password" className="text-xs text-[#FFD166] hover:underline">
+                  <Link href="/login/forgot-password" className="text-xs text-[#4B7CCC] hover:underline">
                     Esqueceu a senha?
                   </Link>
                 </div>
@@ -81,7 +81,7 @@ export  default function LoginPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 pr-10 text-black placeholder:text-gray-500 focus-visible:ring-[#FFFFFF]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 pr-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -101,7 +101,7 @@ export  default function LoginPage() {
                   id="remember"
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked === true)}
-                  className="border-white data-[state=checked]:bg-[#FFFFFF] data-[state=checked]:text-[#1A535C]"
+                  className="border-white data-[state=checked]:bg-[#FFFFFF] data-[state=checked]:text-[#4B7CCC]"
                 />
                 <Label htmlFor="remember" className="text-sm font-normal text-white">
                   Lembrar de mim
@@ -114,7 +114,7 @@ export  default function LoginPage() {
               </Button>
               <p className="text-center text-sm text-white">
                 Não tem uma conta?{" "}
-                <Link href="/register" className="text-[#FFD166] hover:underline">
+                <Link href="/register" className="text-[#4B7CCC] hover:underline">
                   Cadastre-se
                 </Link>
               </p>

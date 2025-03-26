@@ -105,7 +105,7 @@ export function Feed({ className }: FeedProps) {
         </CardHeader>
         <CardFooter className="flex justify-between border-t border-gray-800 pt-4">
           <Button
-            className="rounded-full bg-[#108CD9] text-black hover:bg-[#108CD9]/90"
+            className="rounded-full bg-[#4B7CCC] text-black hover:bg-[#4B7CCC]/90"
             disabled={!postContent.trim()}
           >
             Post
