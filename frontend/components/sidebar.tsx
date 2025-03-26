@@ -14,10 +14,10 @@ export function Sidebar({ className }: SidebarProps) {
       <nav className="grid gap-2">
         <Link
           href="/"
-          className="flex items-center gap-4 rounded-full px-6 py-3 text-lg font-semibold text-[#01dafd] transition-colors hover:bg-[#2a2b2d]"
+          className="flex items-center gap-4 rounded-full px-6 py-3 text-lg font-semibold text-[#205295] transition-colors hover:bg-[#2a2b2d]"
         >
           <Home className="h-6 w-6" />
-          <span>Incio</span>
+          <span>Inicio</span>
         </Link>
         <Link
           href="/explore"
@@ -62,7 +62,7 @@ export function Sidebar({ className }: SidebarProps) {
           <span>Configurações</span>
         </Link>
       </nav>
-      <Button className="w-full rounded-full bg-[#01dafd] text-black hover:bg-[#01dafd]/90">Post</Button>
+      <Button className="w-full rounded-full bg-[#205295] text-black hover:bg-[#205295]/90">Post</Button>
     </aside>
   )
 }

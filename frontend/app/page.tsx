@@ -48,7 +48,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <button className="mt-4 text-[#01dafd] hover:underline">veja mais</button>
+            <button className="mt-4 text-[#205295] hover:underline">veja mais</button>
           </div>
         </div>
       </div>

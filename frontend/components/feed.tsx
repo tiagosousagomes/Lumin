@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+
 
 
 interface Like {
@@ -152,7 +152,7 @@ export function Feed({ className }: FeedProps) {
             </CardContent>
             <CardFooter className="flex justify-between py-2">
               <Button
-                variant="ghost"
+                variant="muted"
                 size="sm"
                 className="gap-1 text-gray-400 hover:text-[#108CD9]"
               >
@@ -160,7 +160,7 @@ export function Feed({ className }: FeedProps) {
                 <span>{post.comments.length}</span>
               </Button>
               <Button
-                variant="ghost"
+                variant="muted"
                 size="sm"
                 className="gap-1 text-gray-400 hover:text-green-500"
               >
@@ -168,7 +168,7 @@ export function Feed({ className }: FeedProps) {
                 <span>0</span>
               </Button>
               <Button
-                variant="ghost"
+                variant="muted"
                 size="sm"
                 className="gap-1 text-gray-400 hover:text-red-500"
               >
@@ -176,7 +176,7 @@ export function Feed({ className }: FeedProps) {
                 <span>{post.likes.length}</span>
               </Button>
               <Button
-                variant="ghost"
+                variant="muted"
                 size="sm"
                 className="text-gray-400 hover:text-[#108CD9]"
               >

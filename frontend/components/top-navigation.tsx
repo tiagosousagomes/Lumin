@@ -25,7 +25,7 @@ export function TopNavigation() {
             </SheetTrigger>
             <SheetContent side="left" className="bg-[#222325] text-white">
               <nav className="grid gap-6 py-6">
-                <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-[#01dafd]">
+                <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-[#205295]">
                   <Home className="h-5 w-5" />
                   Home
                 </Link>
@@ -44,7 +44,7 @@ export function TopNavigation() {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link href="/" className="text-xl font-bold text-[#01dafd]">
+          <Link href="/" className="text-xl font-bold text-[#205295]">
             Lumin
           </Link>
         </div>
@@ -60,7 +60,7 @@ export function TopNavigation() {
             <Input
               type="search"
               placeholder="Pesquisar"
-              className="w-full bg-[#2a2b2d] pl-10 text-white placeholder:text-gray-400 focus-visible:ring-[#01dafd]"
+              className="w-full bg-[#2a2b2d] pl-10 text-white placeholder:text-gray-400 focus-visible:ring-[#205295]"
               onFocus={() => setIsSearchActive(true)}
               onBlur={() => setIsSearchActive(false)}
             />
