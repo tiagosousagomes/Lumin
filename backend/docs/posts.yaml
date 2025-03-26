@@ -1,0 +1,385 @@
+paths:
+  /api/post:
+    get:
+      summary: Lista todos os posts
+      tags:
+        - Posts
+      responses:
+        200:
+          description: Lista de posts retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+        500:
+          description: Erro ao listar os posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: Cria um novo post
+      tags:
+        - Posts
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: Conteúdo do post
+                author:
+                  type: string
+                  description: ID do autor do post
+                image:
+                  type: string
+                  format: binary
+                  description: Imagem do post (opcional)
+              required:
+                - content
+                - author
+      responses:
+        201:
+          description: Post criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Post'
+        404:
+          description: Autor não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Erro ao criar o post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/post/{id}:
+    get:
+      summary: Retorna um post específico
+      tags:
+        - Posts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do post
+      responses:
+        200:
+          description: Post encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Post'
+        404:
+          description: Post não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Erro ao buscar o post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      summary: Atualiza um post existente
+      tags:
+        - Posts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do post a ser atualizado
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: Conteúdo atualizado do post
+                image:
+                  type: string
+                  format: binary
+                  description: Nova imagem do post (opcional)
+              required:
+                - content
+      responses:
+        200:
+          description: Post atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Post'
+        404:
+          description: Post não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Erro ao atualizar o post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: Deleta um post
+      tags:
+        - Posts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do post a ser deletado
+      responses:
+        200:
+          description: Post deletado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        404:
+          description: Post não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Erro ao deletar o post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/post/{id}/like:
+    post:
+      summary: Curte ou descurte um post
+      tags:
+        - Posts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: ID do usuário que está curtindo
+              required:
+                - userId
+      responses:
+        200:
+          description: Curtida processada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  liked:
+                    type: boolean
+                    description: Indica se o post foi curtido (true) ou descurtido (false)
+                  likesCount:
+                    type: integer
+                    description: Número total de curtidas do post
+        404:
+          description: Post não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Erro ao processar a curtida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/user/{id}/posts:
+    get:
+      summary: Lista todos os posts de um usuário
+      tags:
+        - Posts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID do usuário
+      responses:
+        200:
+          description: Posts do usuário listados com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+        404:
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Erro ao listar os posts do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID único do post
+        content:
+          type: string
+          description: Conteúdo do post
+        author:
+          oneOf:
+            - type: string
+              description: ID do autor
+            - $ref: '#/components/schemas/Author'
+        image:
+          type: object
+          properties:
+            data:
+              type: string
+              format: byte
+              description: Dados binários da imagem (Base64)
+            contentType:
+              type: string
+              description: Tipo MIME da imagem
+        likes:
+          type: array
+          items:
+            type: string
+          description: Lista de IDs de usuários que curtiram o post
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+          description: Lista de comentários no post
+        createAt:
+          type: string
+          format: date-time
+          description: Data de criação do post
+        updateAt:
+          type: string
+          format: date-time
+          description: Data da última atualização do post
+    
+    Author:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        username:
+          type: string
+        profilePicture:
+          type: string
+    
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+        content:
+          type: string
+        author:
+          $ref: '#/components/schemas/Author'
+        createAt:
+          type: string
+          format: date-time
+    
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        error:
+          type: string
