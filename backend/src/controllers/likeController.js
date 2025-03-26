@@ -1,128 +1,124 @@
-const Like = require("../models/likes");
+const Comment = require("../models/comment");
 const User = require("../models/user");
 const Post = require("../models/post");
 
-const likePost = async (req, res) => {
-	// Implementação para curtir um post
-	try {
-		//verifica se o post ou o usuario existe
-		const {
-			userID,
-			postID
-		} = req.body;
+const createComment = async (req, res) => {
+  try {
+    const { userID, postID, content } = req.body;
 
-		const user = await User.findById(userID);
-		const post = await Post.findById(postID);
+    console.log({ userID, postID });
 
-		if (!user || !post) {
-			return res.status(404).json({
-				success: false,
-				message: "Usuario ou post não encontrado!",
-			});
-		}
+    const user = await User.findById(userID);
+    const post = await Post.findById(postID);
 
-		//verifica se ja curtiu o post
-		const existingLike = await Like.findOne({
-			user: userID,
-			post: postID
-		});
-		if (existingLike) {
-			return res.status(400).json({
-				success: false,
-				message: "Você já curtiu esse post.",
-			});
-		}
+    if (!user || !post) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario ou post não encontrado!",
+      });
+    }
 
-		// Cria um novo like
-		const like = new Like({
-			user: userID,
-			post: postID
-		});
-		await like.save();
+    const comment = new Comment({ author: userID, post: postID, content });
+    await comment.save();
 
-		res.status(201).json({
-			success: true,
-			message: "curtida adicionada",
-			data: post,
-		});
-	} catch (err) {
-		res.status(500).json({
-			success: false,
-			message: "erro ao curtir o post",
-			error: err.message,
-		});
-	}
+    res.status(201).json({
+      success: true,
+      message: "comentario adicionado",
+      data: comment, 
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "erro ao adicionar comentario",
+      error: err.message,
+    });
+  }
 };
 
-const unlikePost = async (req, res) => {
-	try {
-		const {
-			userID,
-			postID
-		} = req.body;
+const getCommentsByPost = async (req, res) => {
+  try {
+    const postID = req.params.postID;
 
-		const like = await Like.findOneAndDelete({
-			user: userID,
-			post: postID
-		});
+    const comment = await Comment.find({ post: postID }).populate(
+      "author",
+      "name username profilePicture"
+    );
 
-		if (!like) {
-			return res.status(400).json({
-				success: false,
-				message: "Curtida não encontrada",
-			});
-		}
-		res.status(200).json({
-			success: true,
-			message: "curtida removida",
-		});
-	} catch (err) {
-		res.status(500).json({
-			success: false,
-			message: "erro ao curtir",
-			error: err.message,
-		});
-	}
+    console.log(comment);
+
+    res.status(200).json({
+      success: true,
+      message: "comentarios encontradas com sucesso.",
+      data: comment,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "erro ao listar comentarios",
+      error: err.message,
+    });
+  }
 };
 
-const getLikesByPost = async (req, res) => {
-	// Implementação para listar curtidas de um post
+/* 
+const updateComment = async (req, res) => {
+  try {
+    const { commentID } = req.params;
+    const { content } = req.body;
 
-	try {
-		const postID = req.params.postID;
+    const comment = await Comment.findById(commentID);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comentário não encontrado",
+      });
+    }
 
-		const likes = await Like.find({
-			post: postID
-		}).populate(
-			"user",
-			"name username profilePicture"
-		);
+    comment.content = content;
+    comment.updatedAt = Date.now();
+    await comment.save();
 
-		if (likes.length === 0) {
-			return res.status(200).json({
-				success: true,
-				message: "Este post não tem likes.",
-				data: [],
-			});
-		}
+    res.status(200).json({
+      success: true,
+      message: "Comentário atualizado com sucesso",
+      data: comment,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao atualizar comentário",
+      error: err.message,
+    });
+  }
+};
+*/
+const deleteComment = async (req, res) => {
+  try {
+    const { commentID } = req.params;
 
+    const comment = await Comment.findByIdAndDelete(commentID);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comentário não encontrado",
+      });
+    }
 
-		res.status(200).json({
-			success: true,
-			message: "Curtidas encontradas com sucesso.",
-			data: likes,
-		});
-	} catch (err) {
-		res.status(500).json({
-			success: false,
-			message: "erro ao listar curtidas",
-			error: err.message,
-		});
-	}
+    res.status(200).json({
+      success: true,
+      message: "Comentário deletado com sucesso",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao  deletar comentário",
+      error: err.message,
+    });
+  }
 };
 
 module.exports = {
-	likePost,
-	unlikePost,
-	getLikesByPost
+  createComment,
+  getCommentsByPost,
+  deleteComment,
 };
