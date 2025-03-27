@@ -5,6 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import Cookies from "js-cookie";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,36 +31,33 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); 
-  
+    setLoading(true);
+
     try {
       const response = await fetch("http://localhost:3001/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
-  
-      if (!response.ok) {
-        throw new Error("Credenciais inválidas");
-      }
-  
+
       const data = await response.json();
-      console.log(data);
-      
+
+      if (!response.ok) throw new Error(data.message || "Erro desconhecido");
+
+      const { accessToken, refreshToken } = data;
+
+      Cookies.set("access_token", accessToken, { expires: rememberMe ? 7 : undefined }); 
+      Cookies.set("refresh_token", refreshToken, { expires: 7 });
+
       router.push("/");
-  
-    } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      alert("Erro ao fazer login, verifique suas credenciais.");
+
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Erro desconhecido");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#222325] p-4">
