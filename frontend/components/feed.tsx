@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 
 interface Like {
@@ -29,7 +30,7 @@ interface Like {
   post: Post | string;
   createdAt: Date;
 }
-interface Comments{
+interface Comments {
   _id: string;
   content: string;
   author: User | string; // Pode ser o objeto completo ou apenas o ID
@@ -37,11 +38,11 @@ interface Comments{
   createdAt: Date;
   updatedAt: Date;
 }
-interface User{
+interface User {
   _id: string;
   name: string;
   username: string;
-  email: string;   
+  email: string;
 }
 interface Post {
   _id: string;
@@ -126,7 +127,7 @@ export function Feed({ className }: FeedProps) {
       setImageFile(event.target.files[0]);
     }
   };
-  
+
   return (
     <div className={cn("space-y-4", className)}>
       <Card className="border-gray-800 bg-[#2a2b2d]">
@@ -155,9 +156,9 @@ export function Feed({ className }: FeedProps) {
             {/* Botão de upload */}
             <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
               <ImageIcon />
-              <input 
-                type="file" 
-                accept="image/*" 
+              <input
+                type="file"
+                accept="image/*"
                 className="hidden"
                 onChange={handleImageChange}
               />
@@ -210,9 +211,19 @@ export function Feed({ className }: FeedProps) {
                 </div>
                 <p className="text-white">{post.content}</p>
               </div>
-            </CardHeader>  
+            </CardHeader>
             <CardContent className="pb-2 pt-0">
-              
+              {post.image && post.image.data && (
+                <div className="mt-3 overflow-hidden rounded-xl">
+                  <Image
+                    src={`data:${post.image.contentType};base64,${Buffer.from(post.image.data.data).toString("base64")}`}
+                    alt="Post attachment"
+                    className="h-auto w-full object-cover"
+                    width={500}
+                    height={500}
+                  />
+                </div>
+              )}
             </CardContent>
             <CardFooter className="flex justify-between py-2">
               <Button
@@ -254,6 +265,6 @@ export function Feed({ className }: FeedProps) {
   );
 }
 // passo 1: determinar os dados da interface igual o do schema do banco de dados (./backend/src/models) (ok)
-// passo 2: verificar como os dados está saindo das rota de post, dar um try catch na rota pra verificar 
+// passo 2: verificar como os dados está saindo das rota de post, dar um try catch na rota pra verificar
 // passo 3: pegar os dados da api e usar com a interface que você criou
 // passo 4: tirar todo o schema de follow e colocar ele dentro de User (mas espera o grupo decidir antes)
