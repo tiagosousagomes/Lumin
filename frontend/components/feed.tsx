@@ -18,7 +18,9 @@ import {
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { Image as ImageIcon } from "lucide-react";
 
 
 interface Like {
@@ -47,6 +49,7 @@ interface Post {
   author: User;
   likes: Like[];
   comments: Comments[];
+  image?: string
 }
 
 interface responsePost {
@@ -61,6 +64,7 @@ interface FeedProps {
 export function Feed({ className }: FeedProps) {
   const [postContent, setPostContent] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchResponse = async () => {
@@ -80,6 +84,48 @@ export function Feed({ className }: FeedProps) {
     fetchResponse();
   }, []);
 
+  const handleCreatePost = async () => {
+    const token = Cookies.get("access_token");
+    if (!token) return alert("Usuário não autenticado");
+
+    const decoded: any = jwtDecode(token);
+    const userId = decoded.userId;
+
+    const formData = new FormData();
+    formData.append("content", postContent);
+    formData.append("author", userId);
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    try {
+      const response = await fetch("http://localhost:3001/api/post", {
+        method: "POST",
+        body: formData,
+        // headers: {
+        //   Authorization: `Bearer ${token}`, // se o backend exigir token
+        // },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Post criado com sucesso!");
+        setPostContent("");
+        setImageFile(null);
+        setPosts([data.data, ...posts]);
+      } else {
+        alert("Erro ao criar post");
+      }
+    } catch (err) {
+      console.error("Erro ao criar post:", err);
+    }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setImageFile(event.target.files[0]);
+    }
+  };
   
   return (
     <div className={cn("space-y-4", className)}>
@@ -103,10 +149,28 @@ export function Feed({ className }: FeedProps) {
             />
           </div>
         </CardHeader>
-        <CardFooter className="flex justify-between border-t border-gray-800 pt-4">
+
+        <CardFooter className="flex justify-between items-center border-t border-gray-800 pt-4">
+          <div className="flex items-center gap-2">
+            {/* Botão de upload */}
+            <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
+              <ImageIcon />
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden"
+                onChange={handleImageChange}
+              />
+            </label>
+            {imageFile && (
+              <span className="text-xs text-white">{imageFile.name}</span>
+            )}
+          </div>
+
           <Button
             className="rounded-full bg-[#4B7CCC] text-black hover:bg-[#4B7CCC]/90"
             disabled={!postContent.trim()}
+            onClick={handleCreatePost} // ← Função que vai fazer a requisição
           >
             Post
           </Button>
