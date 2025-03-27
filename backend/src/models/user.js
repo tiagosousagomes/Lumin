@@ -56,12 +56,10 @@ let userSchema = new mongoose.Schema({
 	follower: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
-		required: true,
 	},
 	following: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
-		required: true,
 	},
 });
 

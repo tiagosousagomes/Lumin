@@ -1,37 +1,65 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Eye, EyeOff, Lock, Mail } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
-export  default function LoginPage() {
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Evita o recarregamento da página
-    setLoading(true); // Ativa o estado de carregamento
-
-    // Simula um pequeno atraso antes do redirecionamento
-    setTimeout(() => {
-      router.push("/"); // Redireciona para a página raiz
-    }, 1000); // Atraso de 1 segundo
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true); 
   
+    try {
+      const response = await fetch("http://localhost:3001/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Credenciais inválidas");
+      }
+  
+      const data = await response.json();
+      console.log(data);
+      
+      router.push("/");
+  
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("Erro ao fazer login, verifique suas credenciais.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#222325] p-4">
@@ -41,10 +69,12 @@ export  default function LoginPage() {
           <p className="mt-2 text-gray-700">Conecte-se com o mundo</p>
         </div>
 
-        <Card className="border-gray-800 bg-[#2a2b2d]"> 
+        <Card className="border-gray-800 bg-[#2a2b2d]">
           <CardHeader>
             <CardTitle className="text-xl text-white">Entrar</CardTitle>
-            <CardDescription className="text-gray-400">Entre com sua conta para continuar</CardDescription>
+            <CardDescription className="text-gray-400">
+              Entre com sua conta para continuar
+            </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
@@ -71,7 +101,10 @@ export  default function LoginPage() {
                   <Label htmlFor="password" className="text-white">
                     Senha
                   </Label>
-                  <Link href="/login/forgot-password" className="text-xs text-[#4B7CCC] hover:underline">
+                  <Link
+                    href="/login/forgot-password"
+                    className="text-xs text-[#4B7CCC] hover:underline"
+                  >
                     Esqueceu a senha?
                   </Link>
                 </div>
@@ -91,7 +124,11 @@ export  default function LoginPage() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -103,18 +140,28 @@ export  default function LoginPage() {
                   onCheckedChange={(checked) => setRememberMe(checked === true)}
                   className="border-white data-[state=checked]:bg-[#FFFFFF] data-[state=checked]:text-[#4B7CCC]"
                 />
-                <Label htmlFor="remember" className="text-sm font-normal text-white">
+                <Label
+                  htmlFor="remember"
+                  className="text-sm font-normal text-white"
+                >
                   Lembrar de mim
                 </Label>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 p-3">
-              <Button type="submit" className="w-full bg-[#FFFFFF] text-[#1A535C] hover:bg-[#FFFFFF]/90" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full bg-[#FFFFFF] text-[#1A535C] hover:bg-[#FFFFFF]/90"
+                disabled={loading}
+              >
                 {loading ? "Entrando..." : "Entrar"}
               </Button>
               <p className="text-center text-sm text-white">
                 Não tem uma conta?{" "}
-                <Link href="/register" className="text-[#4B7CCC] hover:underline">
+                <Link
+                  href="/register"
+                  className="text-[#4B7CCC] hover:underline"
+                >
                   Cadastre-se
                 </Link>
               </p>
@@ -123,6 +170,5 @@ export  default function LoginPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-
