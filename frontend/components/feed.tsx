@@ -50,7 +50,10 @@ interface Post {
   author: User;
   likes: Like[];
   comments: Comments[];
-  image?: string
+  image:{
+    data: Buffer;
+    contentType: string;
+  }
 }
 
 interface responsePost {
@@ -216,7 +219,7 @@ export function Feed({ className }: FeedProps) {
               {post.image && post.image.data && (
                 <div className="mt-3 overflow-hidden rounded-xl">
                   <Image
-                    src={`data:${post.image.contentType};base64,${Buffer.from(post.image.data.data).toString("base64")}`}
+                    src={`data:${post.image.contentType};base64,${Buffer.from(post.image.data).toString("base64")}`}
                     alt="Post attachment"
                     className="h-auto w-full object-cover"
                     width={500}
