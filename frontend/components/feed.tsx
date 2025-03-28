@@ -65,6 +65,10 @@ interface FeedProps {
   className?: string;
 }
 
+interface jwtPayload{
+  userId: string,
+}
+
 export function Feed({ className }: FeedProps) {
   const [postContent, setPostContent] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
@@ -92,7 +96,7 @@ export function Feed({ className }: FeedProps) {
     const token = Cookies.get("access_token");
     if (!token) return alert("Usuário não autenticado");
 
-    const decoded: any = jwtDecode(token);
+    const decoded: jwtPayload = jwtDecode(token);
     const userId = decoded.userId;
 
     const formData = new FormData();
