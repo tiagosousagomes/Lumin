@@ -13,7 +13,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null)
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000') // URL do seu backend
+    const newSocket = io('http://localhost:3001') 
     
     newSocket.on('connect', () => {
       console.log('Connected to WebSocket server')

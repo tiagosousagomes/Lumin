@@ -77,7 +77,7 @@ export function Feed({ className }: FeedProps) {
   useEffect(() => {
     const fetchResponse = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/post"); // Ajuste o endpoint conforme necessário
+        const response = await fetch("http://localhost:3001/api/post");
         const data: responsePost = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
