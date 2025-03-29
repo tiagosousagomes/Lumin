@@ -53,14 +53,14 @@ let userSchema = new mongoose.Schema({
 			message: (props) => `${props.value} não é um e-mail válido!`,
 		},
 	},
-	follower: {
+	follower: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
-	},
-	following: {
+	}],
+	following: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
-	},
+	}],
 });
 
 userSchema.pre("save", function(next) {

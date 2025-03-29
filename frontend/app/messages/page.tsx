@@ -1,7 +1,8 @@
 "use client"
 
 import { Send } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
+import { useSocket } from "../context/SocketContext" // Você precisará criar este contexto
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -9,88 +10,156 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TopNavigation } from "@/components/top-navigation"
 
+interface Contact {
+  id: number
+  name: string
+  avatar: string
+  lastMessage: string
+  time: string
+  unread: boolean
+}
+
+interface Message {
+  id: number
+  senderId: number | "me"
+  text: string
+  time: string
+}
+
 export default function MessagesPage() {
-  const [selectedChat, setSelectedChat] = useState(1)
+  const [selectedChat, setSelectedChat] = useState<number | null>(null)
   const [messageText, setMessageText] = useState("")
+  const [messages, setMessages] = useState<Message[]>([])
+  const [contacts, setContacts] = useState<Contact[]>([])
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // Supondo que você tenha o ID do usuário atual (você pode obtê-lo de auth/context)
+  const currentUserId = 1 // Substitua pelo ID real do usuário logado
+  const { socket } = useSocket()
 
-  const contacts = [
-    {
-      id: 1,
-      name: "Alex Johnson",
-      avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "Hey, how's your project coming along?",
-      time: "2m",
-      unread: true,
-    },
-    {
-      id: 2,
-      name: "Sarah Williams",
-      avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "The design looks great! I'll send feedback tomorrow.",
-      time: "1h",
-      unread: false,
-    },
-    {
-      id: 3,
-      name: "Michael Brown",
-      avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "Are we still meeting at 3pm?",
-      time: "3h",
-      unread: false,
-    },
-    {
-      id: 4,
-      name: "Emily Davis",
-      avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "Thanks for your help yesterday!",
-      time: "1d",
-      unread: false,
-    },
-  ]
+  // Dados iniciais (em uma aplicação real, você buscaria isso da API)
+  useEffect(() => {
+    const initialContacts = [
+      {
+        id: 1,
+        name: "Alex Johnson",
+        avatar: "/placeholder.svg?height=40&width=40",
+        lastMessage: "Hey, how's your project coming along?",
+        time: "2m",
+        unread: true,
+      },
+      {
+        id: 2,
+        name: "Sarah Williams",
+        avatar: "/placeholder.svg?height=40&width=40",
+        lastMessage: "The design looks great! I'll send feedback tomorrow.",
+        time: "1h",
+        unread: false,
+      },
+      {
+        id: 3,
+        name: "Michael Brown",
+        avatar: "/placeholder.svg?height=40&width=40",
+        lastMessage: "Are we still meeting at 3pm?",
+        time: "3h",
+        unread: false,
+      },
+      {
+        id: 4,
+        name: "Emily Davis",
+        avatar: "/placeholder.svg?height=40&width=40",
+        lastMessage: "Thanks for your help yesterday!",
+        time: "1d",
+        unread: false,
+      },
+    ]
 
-  const messages = [
-    {
-      id: 1,
-      senderId: 1,
-      text: "Hey, how's your project coming along?",
-      time: "10:30 AM",
-    },
-    {
-      id: 2,
-      senderId: "me",
-      text: "It's going well! I'm just finishing up the UI design for the dashboard.",
-      time: "10:32 AM",
-    },
-    {
-      id: 3,
-      senderId: 1,
-      text: "That sounds great! Can you share a preview when you're done?",
-      time: "10:33 AM",
-    },
-    {
-      id: 4,
-      senderId: "me",
-      text: "Sure thing! I'll send it over by end of day.",
-      time: "10:35 AM",
-    },
-    {
-      id: 5,
-      senderId: 1,
-      text: "Perfect, looking forward to it. By the way, did you see the new design system updates?",
-      time: "10:36 AM",
-    },
-    {
-      id: 6,
-      senderId: "me",
-      text: "Not yet, I'll check them out right now. Thanks for the heads up!",
-      time: "10:38 AM",
-    },
-  ]
+    const initialMessages = [
+      {
+        id: 1,
+        senderId: 1,
+        text: "Hey, how's your project coming along?",
+        time: "10:30 AM",
+      },
+      {
+        id: 2,
+        senderId: "me",
+        text: "It's going well! I'm just finishing up the UI design for the dashboard.",
+        time: "10:32 AM",
+      },
+      {
+        id: 3,
+        senderId: 1,
+        text: "That sounds great! Can you share a preview when you're done?",
+        time: "10:33 AM",
+      },
+      {
+        id: 4,
+        senderId: "me",
+        text: "Sure thing! I'll send it over by end of day.",
+        time: "10:35 AM",
+      },
+    ]
+
+    setContacts(initialContacts)
+    setMessages(initialMessages)
+  }, [])
+
+  // Configuração do WebSocket
+  useEffect(() => {
+    if (!socket) return
+
+    // Adiciona o usuário atual à lista de usuários online
+    socket.emit('add_user', currentUserId)
+
+    // Escuta mensagens recebidas
+    socket.on('receive_message', (data: { senderId: number, text: string }) => {
+      if (data.senderId === selectedChat) {
+        setMessages(prev => [...prev, {
+          id: prev.length + 1,
+          senderId: data.senderId,
+          text: data.text,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }])
+      }
+    })
+
+    return () => {
+      socket.off('receive_message')
+    }
+  }, [socket, selectedChat, currentUserId])
+
+  // Rolagem automática para a última mensagem
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   const handleSendMessage = () => {
-    if (messageText.trim()) {
-      // In a real app, you would add the message to the messages array
-      // and send it to the server
+    if (messageText.trim() && selectedChat && socket) {
+      // Envia mensagem pelo WebSocket
+      socket.emit('send_message', {
+        senderId: currentUserId,
+        receiverId: selectedChat,
+        text: messageText
+      })
+
+      // Adiciona a mensagem localmente
+      setMessages(prev => [...prev, {
+        id: prev.length + 1,
+        senderId: "me",
+        text: messageText,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }])
+
+      // Atualiza o último contato
+      setContacts(prev => 
+        prev.map(contact =>
+          contact.id === selectedChat 
+            ? { ...contact, lastMessage: messageText, time: "now", unread: false }
+            : contact
+        )
+      )
+
       setMessageText("")
     }
   }
@@ -113,7 +182,15 @@ export default function MessagesPage() {
                   className={`flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-[#2a2b2d] ${
                     selectedChat === contact.id ? "bg-[#2a2b2d]" : ""
                   }`}
-                  onClick={() => setSelectedChat(contact.id)}
+                  onClick={() => {
+                    setSelectedChat(contact.id)
+                    // Marca como lido ao selecionar
+                    setContacts(prev => 
+                      prev.map(c => 
+                        c.id === contact.id ? { ...c, unread: false } : c
+                      )
+                    )
+                  }}
                 >
                   <Avatar>
                     <AvatarImage src={contact.avatar} alt={contact.name} />
@@ -164,6 +241,7 @@ export default function MessagesPage() {
                       </div>
                     </div>
                   ))}
+                  <div ref={messagesEndRef} />
                 </div>
               </ScrollArea>
 
@@ -207,4 +285,3 @@ export default function MessagesPage() {
     </div>
   )
 }
-
