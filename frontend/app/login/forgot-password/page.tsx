@@ -31,14 +31,14 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F7FFF7] p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#222325] p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#1A535C]">Lumin</h1>
+          <h1 className="text-3xl font-bold text-[#4B7CCC]">Lumin</h1>
           <p className="mt-2 text-gray-400">Recupere o acesso à sua conta</p>
         </div>
 
-        <Card className="border-gray-800 bg-[#1A535C]">
+        <Card className="border-gray-800 bg-[#2A2B2F]">
           <CardHeader>
             <CardTitle className="text-xl text-white">Recuperar Senha</CardTitle>
             <CardDescription className="text-gray-400">Enviaremos um link para redefinir sua senha</CardDescription>
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
 
           {success ? (
             <CardContent className="space-y-4">
-              <div className="rounded-md bg-green-900/20 p-4 text-sm text-green-300">
+              <div className="rounded-md bg-[#4B7CCC]/30 p-4 text-sm text-white">
                 <p>Email de recuperação enviado com sucesso!</p>
                 <p className="mt-2">Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.</p>
               </div>
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
               <CardFooter className="flex flex-col space-y-4 p-6">
                 <Button
                   type="submit"
-                  className="w-full bg-[#FFFFFF] text-[#1A535C] hover:bg-[#FFFFFF]/90"
+                  className="w-full bg-[#FFFFFF] text-[#4B7CCC] hover:bg-[#FFFFFF]/90"
                   disabled={loading}
                 >
                   {loading ? "Enviando..." : "Enviar Link de Recuperação"}
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
           <div className="p-6 pt-0">
             <Link
               href="/login"
-              className="flex items-center justify-center gap-2 text-sm text-[#FFFFFF] hover:underline"
+              className="flex items-center justify-center gap-2 text-sm text-[#4B7CCC] hover:underline"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar para o login

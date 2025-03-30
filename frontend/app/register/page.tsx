@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
+import Cookies from "js-cookie"
 
 
 export default function RegisterPage() {
@@ -21,6 +21,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [rememberMe] = useState(false)
   const [formError, setFormError] = useState("")
 
   const validateForm = (): boolean => {
@@ -50,6 +51,38 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormError("")
+
+    try{
+      const registerResponse = await fetch("http://localhost:3001/api/register",{
+        method:"POST",
+        headers:{ "Content-Type": "application/json" },
+        body:JSON.stringify({name,username, email, password})
+
+      })
+
+      const dataRegisterResponse = await registerResponse.json()
+
+      if (!registerResponse.ok) throw new Error(dataRegisterResponse.message || "Erro desconhecido");
+
+      const authResponse = await fetch("http://localhost:3001/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const dataAuthResponse = await authResponse.json();
+
+      if (!authResponse.ok) throw new Error(dataAuthResponse.message || "Erro desconhecido");
+
+      const { accessToken, refreshToken } = dataAuthResponse;
+
+      Cookies.set("access_token", accessToken, { expires: rememberMe ? 7 : undefined }); 
+      Cookies.set("refresh_token", refreshToken, { expires: 7 });
+
+      router.push("/");
+    }catch{
+
+    }
 
     if (!validateForm()) {
       return

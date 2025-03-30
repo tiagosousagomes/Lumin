@@ -1,8 +1,4 @@
 let mongoose = require("mongoose");
-const {
-	type
-} = require("os");
-
 
 let userSchema = new mongoose.Schema({
 	name: {

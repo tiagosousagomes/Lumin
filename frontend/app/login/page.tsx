@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
@@ -132,14 +131,15 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center space-x-2">
+                
                 <Checkbox
                   id="remember"
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked === true)}
-                  className="border-white data-[state=checked]:bg-[#FFFFFF] data-[state=checked]:text-[#4B7CCC]"
+                  className="border-white data-[state=checked]:bg-[#4B7CCC] data-[state=checked]:text-[#ffffff]"
                 />
                 <Label
-                  htmlFor="remember"
+                  htmlFor="remember" 
                   className="text-sm font-normal text-white"
                 >
                   Lembrar de mim
@@ -149,7 +149,7 @@ export default function LoginPage() {
             <CardFooter className="flex flex-col space-y-4 p-3">
               <Button
                 type="submit"
-                className="w-full bg-[#FFFFFF] text-[#1A535C] hover:bg-[#FFFFFF]/90"
+                className="w-full bg-[#FFFFFF] text-[#4b7ccc] hover:bg-[#FFFFFF]/90"
                 disabled={loading}
               >
                 {loading ? "Entrando..." : "Entrar"}

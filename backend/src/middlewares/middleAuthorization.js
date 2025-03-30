@@ -43,6 +43,14 @@ const userAuthenticator = async (req, res, next) => {
   }
 };
 
+const userAuthenticatorRegister = async (req, res, next) =>{
+try{
+  const { name, username, email, password } = req.body;
+  
+}catch{
+
+}
+}
 
 const refreshTokenHandler = (req, res) => {
   const { token } = req.body;

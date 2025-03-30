@@ -7,7 +7,7 @@ const createUser = async (req, res, next) => {
   try {
     // verifica se ja existe o email
 
-    const { name, password, username, bio, profilePicture, email } = req.body;
+    const { name,username,email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -22,11 +22,9 @@ const createUser = async (req, res, next) => {
 
     const user = new User({
       name,
-      password: hashedPassword,
       username,
-      bio,
-      profilePicture,
       email,
+      password: hashedPassword,
     });
     await user.save();
 

@@ -3,11 +3,13 @@ const userController = require("../controllers/userController");
 const { userAuthenticator, refreshTokenHandler, logoutUser } = require("../middlewares/middleAuthorization");
 const authMiddleware = require("../middlewares/authMiddleware");
 
+
 const router = express.Router();
 
 router.post("/login", userAuthenticator);
 router.post("/refresh-token", refreshTokenHandler); 
 router.post("/logout", logoutUser); 
+router.post("/register",userController.createUser)
 
 router.get("/user/", authMiddleware, userController.getAllUser);
 router.get("/user/:id", authMiddleware, userController.getUserById);
