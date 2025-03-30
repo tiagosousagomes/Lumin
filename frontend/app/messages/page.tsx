@@ -2,7 +2,9 @@
 
 import { Send } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
-import { useSocket } from "../context/SocketContext" // Você precisará criar este contexto
+import { useSocket } from "../context/SocketContext"
+import Cookies from "js-cookie"
+import { jwtDecode } from "jwt-decode"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -11,110 +13,114 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { TopNavigation } from "@/components/top-navigation"
 
 interface Contact {
-  id: number
-  name: string
-  avatar: string
-  lastMessage: string
-  time: string
-  unread: boolean
+  id: string;
+  name: string;
+  username: string;
+  avatar: string;
+  lastMessage?: string;
+  time?: string;
+  unread?: boolean;
 }
 
 interface Message {
-  id: number
-  senderId: number | "me"
-  text: string
-  time: string
+  id: number;
+  senderId: string | "me";
+  text: string;
+  time: string;
+}
+
+interface User {
+  _id: string;
+  name: string;
+  username: string;
+  profilePicture?: string;
+}
+
+interface JwtPayload {
+  userId: string;
+  // Add other JWT payload fields as needed
+}
+
+interface FollowingResponse {
+  success: boolean;
+  message: string;
+  following: Array<{
+    following: User;
+  }>;
 }
 
 export default function MessagesPage() {
-  const [selectedChat, setSelectedChat] = useState<number | null>(null)
+  const [selectedChat, setSelectedChat] = useState<string | null>(null)
   const [messageText, setMessageText] = useState("")
   const [messages, setMessages] = useState<Message[]>([])
   const [contacts, setContacts] = useState<Contact[]>([])
+  const [loading, setLoading] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
-  // Supondo que você tenha o ID do usuário atual (você pode obtê-lo de auth/context)
-  const currentUserId = 1 // Substitua pelo ID real do usuário logado
   const { socket } = useSocket()
 
-  // Dados iniciais (em uma aplicação real, você buscaria isso da API)
+  // Get userId from cookies on component mount
   useEffect(() => {
-    const initialContacts = [
-      {
-        id: 1,
-        name: "Alex Johnson",
-        avatar: "/placeholder.svg?height=40&width=40",
-        lastMessage: "Hey, how's your project coming along?",
-        time: "2m",
-        unread: true,
-      },
-      {
-        id: 2,
-        name: "Sarah Williams",
-        avatar: "/placeholder.svg?height=40&width=40",
-        lastMessage: "The design looks great! I'll send feedback tomorrow.",
-        time: "1h",
-        unread: false,
-      },
-      {
-        id: 3,
-        name: "Michael Brown",
-        avatar: "/placeholder.svg?height=40&width=40",
-        lastMessage: "Are we still meeting at 3pm?",
-        time: "3h",
-        unread: false,
-      },
-      {
-        id: 4,
-        name: "Emily Davis",
-        avatar: "/placeholder.svg?height=40&width=40",
-        lastMessage: "Thanks for your help yesterday!",
-        time: "1d",
-        unread: false,
-      },
-    ]
-
-    const initialMessages = [
-      {
-        id: 1,
-        senderId: 1,
-        text: "Hey, how's your project coming along?",
-        time: "10:30 AM",
-      },
-      {
-        id: 2,
-        senderId: "me",
-        text: "It's going well! I'm just finishing up the UI design for the dashboard.",
-        time: "10:32 AM",
-      },
-      {
-        id: 3,
-        senderId: 1,
-        text: "That sounds great! Can you share a preview when you're done?",
-        time: "10:33 AM",
-      },
-      {
-        id: 4,
-        senderId: "me",
-        text: "Sure thing! I'll send it over by end of day.",
-        time: "10:35 AM",
-      },
-    ]
-
-    setContacts(initialContacts)
-    setMessages(initialMessages)
+    const token = Cookies.get("access_token")
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token)
+        setUserId(decoded.userId)
+      } catch (error) {
+        console.error("Error decoding token:", error)
+      }
+    }
   }, [])
 
-  // Configuração do WebSocket
+  // Fetch following users from API
   useEffect(() => {
-    if (!socket) return
+    const fetchFollowing = async () => {
+      if (!userId) return
+      
+      try {
+        setLoading(true)
+        const response = await fetch(`http://localhost:3001/api/following/${userId}`)
+        
+        if (!response.ok) {
+          throw new Error('Erro ao buscar contatos')
+        }
 
-    // Adiciona o usuário atual à lista de usuários online
-    socket.emit('add_user', currentUserId)
+        const data: FollowingResponse = await response.json()
+        
+        if (data.success && data.following) {
+          const formattedContacts = data.following.map((item) => ({
+            id: item.following._id,
+            name: item.following.name,
+            username: item.following.username,
+            avatar: item.following.profilePicture || '/placeholder.svg?height=40&width=40',
+            lastMessage: "",
+            time: "",
+            unread: false
+          }))
+          
+          setContacts(formattedContacts)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar contatos:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    // Escuta mensagens recebidas
-    socket.on('receive_message', (data: { senderId: number, text: string }) => {
-      if (data.senderId === selectedChat) {
+    fetchFollowing()
+  }, [userId])
+
+  // WebSocket setup
+  useEffect(() => {
+    if (!socket || !userId) return
+
+    // Add current user to online users list
+    socket.emit('add_user', userId)
+
+    // Listen for incoming messages
+    socket.on('receive_message', (data: { senderId: string, text: string }) => {
+      if (selectedChat && data.senderId === selectedChat) {
         setMessages(prev => [...prev, {
           id: prev.length + 1,
           senderId: data.senderId,
@@ -127,23 +133,23 @@ export default function MessagesPage() {
     return () => {
       socket.off('receive_message')
     }
-  }, [socket, selectedChat, currentUserId])
+  }, [socket, userId, selectedChat])
 
-  // Rolagem automática para a última mensagem
+  // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   const handleSendMessage = () => {
-    if (messageText.trim() && selectedChat && socket) {
-      // Envia mensagem pelo WebSocket
+    if (messageText.trim() && selectedChat && socket && userId) {
+      // Send message via WebSocket
       socket.emit('send_message', {
-        senderId: currentUserId,
+        senderId: userId,
         receiverId: selectedChat,
         text: messageText
       })
 
-      // Adiciona a mensagem localmente
+      // Add message locally
       setMessages(prev => [...prev, {
         id: prev.length + 1,
         senderId: "me",
@@ -151,7 +157,7 @@ export default function MessagesPage() {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }])
 
-      // Atualiza o último contato
+      // Update last contact
       setContacts(prev => 
         prev.map(contact =>
           contact.id === selectedChat 
@@ -174,40 +180,46 @@ export default function MessagesPage() {
           <div className="mb-4">
             <h2 className="text-xl font-bold">Messages</h2>
           </div>
-          <ScrollArea className="h-[calc(100vh-8rem)]">
-            <div className="space-y-2 pr-4">
-              {contacts.map((contact) => (
-                <button
-                  key={contact.id}
-                  className={`flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-[#2a2b2d] ${
-                    selectedChat === contact.id ? "bg-[#2a2b2d]" : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedChat(contact.id)
-                    // Marca como lido ao selecionar
-                    setContacts(prev => 
-                      prev.map(c => 
-                        c.id === contact.id ? { ...c, unread: false } : c
-                      )
-                    )
-                  }}
-                >
-                  <Avatar>
-                    <AvatarImage src={contact.avatar} alt={contact.name} />
-                    <AvatarFallback>{contact.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{contact.name}</span>
-                      <span className="text-xs text-gray-400">{contact.time}</span>
-                    </div>
-                    <p className="line-clamp-1 text-sm text-gray-400">{contact.lastMessage}</p>
-                  </div>
-                  {contact.unread && <div className="h-2 w-2 rounded-full bg-[#01dafd]" aria-hidden="true" />}
-                </button>
-              ))}
+          {loading ? (
+            <div className="flex justify-center p-4">
+              <p>Carregando contatos...</p>
             </div>
-          </ScrollArea>
+          ) : (
+            <ScrollArea className="h-[calc(100vh-8rem)]">
+              <div className="space-y-2 pr-4">
+                {contacts.map((contact) => (
+                  <button
+                    key={contact.id}
+                    className={`flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-[#2a2b2d] ${
+                      selectedChat === contact.id ? "bg-[#2a2b2d]" : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedChat(contact.id)
+                      // Mark as read when selected
+                      setContacts(prev => 
+                        prev.map(c => 
+                          c.id === contact.id ? { ...c, unread: false } : c
+                        )
+                      )
+                    }}
+                  >
+                    <Avatar>
+                      <AvatarImage src={contact.avatar} alt={contact.name} />
+                      <AvatarFallback>{contact.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{contact.name}</span>
+                        <span className="text-xs text-gray-400">{contact.time}</span>
+                      </div>
+                      <p className="line-clamp-1 text-sm text-gray-400">{contact.lastMessage}</p>
+                    </div>
+                    {contact.unread && <div className="h-2 w-2 rounded-full bg-[#01dafd]" aria-hidden="true" />}
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
         </div>
 
         <div className="flex flex-col md:col-span-2 lg:col-span-3">
@@ -220,7 +232,7 @@ export default function MessagesPage() {
                 </Avatar>
                 <div>
                   <h2 className="font-semibold">{selectedContact.name}</h2>
-                  <p className="text-xs text-gray-400">Online</p>
+                  <p className="text-xs text-gray-400">@{selectedContact.username}</p>
                 </div>
               </div>
 
@@ -275,8 +287,14 @@ export default function MessagesPage() {
           ) : (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <h3 className="text-xl font-semibold">Select a conversation</h3>
-                <p className="text-gray-400">Choose a contact to start messaging</p>
+                <h3 className="text-xl font-semibold">
+                  {loading ? 'Carregando...' : 'Select a conversation'}
+                </h3>
+                <p className="text-gray-400">
+                  {contacts.length === 0 && !loading 
+                    ? 'Você não está seguindo ninguém ainda' 
+                    : 'Choose a contact to start messaging'}
+                </p>
               </div>
             </div>
           )}

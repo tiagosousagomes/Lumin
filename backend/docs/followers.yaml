@@ -12,15 +12,15 @@ paths:
             schema:
               type: object
               properties:
-                followerId:
+                followerID:
                   type: string
                   description: ID of the user who wants to follow
-                followingId:
+                followingID:
                   type: string
                   description: ID of the user to be followed
               required:
-                - followerId
-                - followingId
+                - followerID
+                - followingID
       responses:
         '200':
           description: Successfully followed the user
