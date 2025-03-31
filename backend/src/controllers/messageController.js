@@ -151,9 +151,35 @@ const deleteMessage = async (req, res) => {
 }
 };
 
+const getMessagesBetweenUsers = async (req, res) => {
+  try {
+    const { userId, receiverId } = req.params;
+    
+    const messages = await Message.find({
+      $or: [
+        { senderId: userId, receiverId: receiverId },
+        { senderId: receiverId, receiverId: userId }
+      ]
+    }).sort({ createdAt: 1 });
+    
+    return res.status(200).json({
+      success: true,
+      messages: messages
+    });
+  } catch (error) {
+    console.error('Error fetching messages between users:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch messages',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
   markMessageAsRead,
   getMessages,
   deleteMessage,
+  getMessagesBetweenUsers
 };

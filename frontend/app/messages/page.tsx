@@ -1,7 +1,7 @@
 "use client"
 
 import { Send } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useSocket } from "../context/SocketContext"
 import Cookies from "js-cookie"
 import { jwtDecode } from "jwt-decode"
@@ -23,8 +23,9 @@ interface Contact {
 }
 
 interface Message {
-  id: number;
-  senderId: string | "me";
+  id: string;
+  senderId: string;
+  receiverId: string;
   text: string;
   time: string;
 }
@@ -38,7 +39,6 @@ interface User {
 
 interface JwtPayload {
   userId: string;
-  // Add other JWT payload fields as needed
 }
 
 interface FollowingResponse {
@@ -56,11 +56,11 @@ export default function MessagesPage() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
-  const { socket } = useSocket()
+  const { socket, isConnected } = useSocket()
 
-  // Get userId from cookies on component mount
   useEffect(() => {
     const token = Cookies.get("access_token")
     if (token) {
@@ -73,7 +73,6 @@ export default function MessagesPage() {
     }
   }, [])
 
-  // Fetch following users from API
   useEffect(() => {
     const fetchFollowing = async () => {
       if (!userId) return
@@ -83,7 +82,7 @@ export default function MessagesPage() {
         const response = await fetch(`http://localhost:3001/api/following/${userId}`)
         
         if (!response.ok) {
-          throw new Error('Erro ao buscar contatos')
+          throw new Error('Error fetching contacts')
         }
 
         const data: FollowingResponse = await response.json()
@@ -102,7 +101,7 @@ export default function MessagesPage() {
           setContacts(formattedContacts)
         }
       } catch (error) {
-        console.error('Erro ao buscar contatos:', error)
+        console.error('Error fetching contacts:', error)
       } finally {
         setLoading(false)
       }
@@ -111,6 +110,43 @@ export default function MessagesPage() {
     fetchFollowing()
   }, [userId])
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!userId || !selectedChat) return
+      
+      try {
+        setLoading(true)
+        const response = await fetch(`http://localhost:3001/api/messages/${userId}/${selectedChat}`)
+        
+        if (!response.ok) {
+          throw new Error('Error fetching messages')
+        }
+
+        const data = await response.json()
+        
+        if (data.success && data.messages) {
+          const formattedMessages = data.messages.map((msg: any) => ({
+            id: msg._id,
+            senderId: msg.senderId === userId ? "me" : msg.senderId,
+            receiverId: msg.receiverId,
+            text: msg.text,
+            time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }))
+          
+          setMessages(formattedMessages)
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (selectedChat) {
+      fetchMessages()
+    }
+  }, [selectedChat, userId])
+
   // WebSocket setup
   useEffect(() => {
     if (!socket || !userId) return
@@ -118,57 +154,90 @@ export default function MessagesPage() {
     // Add current user to online users list
     socket.emit('add_user', userId)
 
+    // Listen for online users
+    socket.on('get_users', (users: string[]) => {
+      setOnlineUsers(users)
+    })
+
     // Listen for incoming messages
-    socket.on('receive_message', (data: { senderId: string, text: string }) => {
+    socket.on('receive_message', (data: Message) => {
+      // If message is from the currently selected chat
       if (selectedChat && data.senderId === selectedChat) {
         setMessages(prev => [...prev, {
-          id: prev.length + 1,
-          senderId: data.senderId,
-          text: data.text,
+          ...data,
+          senderId: selectedChat, // Keep the id for proper identification
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }])
+      } 
+      // If message is from another chat, update that contact's last message
+      else {
+        setContacts(prev => 
+          prev.map(contact =>
+            contact.id === data.senderId 
+              ? { 
+                  ...contact, 
+                  lastMessage: data.text, 
+                  time: "now", 
+                  unread: true 
+                }
+              : contact
+          )
+        )
+        
+        // Optional: Show notification for new message
+        if (data.senderId !== selectedChat) {
+          const sender = contacts.find(c => c.id === data.senderId)
+        }
       }
     })
 
     return () => {
       socket.off('receive_message')
+      socket.off('get_users')
     }
-  }, [socket, userId, selectedChat])
+  }, [socket, userId, selectedChat, contacts])
 
-  // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const handleSendMessage = () => {
-    if (messageText.trim() && selectedChat && socket && userId) {
-      // Send message via WebSocket
-      socket.emit('send_message', {
+  const generateMessageId = () => {
+    return Date.now().toString() + Math.random().toString(36).substr(2, 5)
+  }
+
+  const handleSendMessage = useCallback(() => {
+    if (messageText.trim() && selectedChat && socket && userId && isConnected) {
+      const messageId = generateMessageId()
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      
+      const messageData = {
+        id: messageId,
         senderId: userId,
         receiverId: selectedChat,
-        text: messageText
-      })
-
-      // Add message locally
-      setMessages(prev => [...prev, {
-        id: prev.length + 1,
-        senderId: "me",
         text: messageText,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: timestamp
+      }
+      
+      socket.emit('send_message', messageData)
+
+      setMessages(prev => [...prev, {
+        ...messageData,
+        senderId: "me",
       }])
 
-      // Update last contact
       setContacts(prev => 
         prev.map(contact =>
           contact.id === selectedChat 
-            ? { ...contact, lastMessage: messageText, time: "now", unread: false }
+            ? { ...contact, lastMessage: messageText, time: "now" }
             : contact
         )
       )
 
       setMessageText("")
+    } else if (!isConnected) {
+     return
     }
-  }
+  }, [messageText, selectedChat, socket, userId, isConnected])
 
   const selectedContact = contacts.find((contact) => contact.id === selectedChat)
 
@@ -177,12 +246,16 @@ export default function MessagesPage() {
       <TopNavigation />
       <div className="container mx-auto grid h-[calc(100vh-4rem)] grid-cols-1 gap-0 p-4 md:grid-cols-3 lg:grid-cols-4">
         <div className="border-r border-gray-800 pr-4 md:col-span-1">
-          <div className="mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold">Messages</h2>
+            <div className="flex items-center gap-2">
+              <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="text-xs text-gray-400">{isConnected ? 'Connected' : 'Disconnected'}</span>
+            </div>
           </div>
-          {loading ? (
+          {loading && contacts.length === 0 ? (
             <div className="flex justify-center p-4">
-              <p>Carregando contatos...</p>
+              <p>Loading contacts...</p>
             </div>
           ) : (
             <ScrollArea className="h-[calc(100vh-8rem)]">
@@ -203,10 +276,15 @@ export default function MessagesPage() {
                       )
                     }}
                   >
-                    <Avatar>
-                      <AvatarImage src={contact.avatar} alt={contact.name} />
-                      <AvatarFallback>{contact.name[0]}</AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar>
+                        <AvatarImage src={contact.avatar} alt={contact.name} />
+                        <AvatarFallback>{contact.name[0]}</AvatarFallback>
+                      </Avatar>
+                      {onlineUsers.includes(contact.id) && (
+                        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-[#222325]"></span>
+                      )}
+                    </div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{contact.name}</span>
@@ -226,33 +304,47 @@ export default function MessagesPage() {
           {selectedContact ? (
             <>
               <div className="flex items-center gap-3 border-b border-gray-800 p-4">
-                <Avatar>
-                  <AvatarImage src={selectedContact.avatar} alt={selectedContact.name} />
-                  <AvatarFallback>{selectedContact.name[0]}</AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar>
+                    <AvatarImage src={selectedContact.avatar} alt={selectedContact.name} />
+                    <AvatarFallback>{selectedContact.name[0]}</AvatarFallback>
+                  </Avatar>
+                  {onlineUsers.includes(selectedContact.id) && (
+                    <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-[#222325]"></span>
+                  )}
+                </div>
                 <div>
                   <h2 className="font-semibold">{selectedContact.name}</h2>
                   <p className="text-xs text-gray-400">@{selectedContact.username}</p>
+                </div>
+                <div className="ml-auto text-xs text-gray-400">
+                  {onlineUsers.includes(selectedContact.id) ? 'Online' : 'Offline'}
                 </div>
               </div>
 
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.senderId === "me" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                          message.senderId === "me" ? "bg-[#01dafd] text-black" : "bg-[#2a2b2d] text-white"
-                        }`}
-                      >
-                        <p>{message.text}</p>
-                        <p className="mt-1 text-right text-xs opacity-70">{message.time}</p>
-                      </div>
+                  {messages.length === 0 ? (
+                    <div className="flex h-32 items-center justify-center">
+                      <p className="text-gray-400">No messages yet. Start the conversation!</p>
                     </div>
-                  ))}
+                  ) : (
+                    messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.senderId === "me" ? "justify-end" : "justify-start"}`}
+                      >
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                            message.senderId === "me" ? "bg-[#01dafd] text-black" : "bg-[#2a2b2d] text-white"
+                          }`}
+                        >
+                          <p>{message.text}</p>
+                          <p className="mt-1 text-right text-xs opacity-70">{message.time}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
               </ScrollArea>
@@ -271,28 +363,34 @@ export default function MessagesPage() {
                         handleSendMessage()
                       }
                     }}
+                    disabled={!isConnected}
                   />
                   <Button
                     size="icon"
                     className="bg-[#01dafd] text-black hover:bg-[#01dafd]/90"
                     onClick={handleSendMessage}
-                    disabled={!messageText.trim()}
+                    disabled={!messageText.trim() || !isConnected}
                   >
                     <Send className="h-4 w-4" />
                     <span className="sr-only">Send</span>
                   </Button>
                 </div>
+                {!isConnected && (
+                  <p className="mt-2 text-center text-xs text-red-400">
+                    You're currently offline. Messages can't be sent until connection is restored.
+                  </p>
+                )}
               </div>
             </>
           ) : (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
                 <h3 className="text-xl font-semibold">
-                  {loading ? 'Carregando...' : 'Select a conversation'}
+                  {loading ? 'Loading...' : 'Select a conversation'}
                 </h3>
                 <p className="text-gray-400">
                   {contacts.length === 0 && !loading 
-                    ? 'Você não está seguindo ninguém ainda' 
+                    ? 'You are not following anyone yet' 
                     : 'Choose a contact to start messaging'}
                 </p>
               </div>
