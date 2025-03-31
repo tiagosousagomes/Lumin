@@ -1,27 +1,17 @@
 "use client";
 
-import {
-  Heart,
-  MessageCircle,
-  MoreHorizontal,
-  Repeat,
-  Share,
-} from "lucide-react";
+import {Heart, MessageCircle,MoreHorizontal,Repeat,Share, SmilePlus} from "lucide-react";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card,  CardContent,  CardFooter, CardHeader,} from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react'
 
 
 interface Like {
@@ -73,6 +63,7 @@ export function Feed({ className }: FeedProps) {
   const [postContent, setPostContent] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useEffect(() => {
     const fetchResponse = async () => {
@@ -135,6 +126,24 @@ export function Feed({ className }: FeedProps) {
     }
   };
 
+  // Adicione no início do componente
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.emoji-picker-container') && !target.closest('.emoji-button')) {
+      setShowEmojiPicker(false);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, []);
+
+  const handleEmojiClick = (emojiData: EmojiClickData) =>{
+    setPostContent(prev => prev + emojiData.emoji);
+    setShowEmojiPicker(false)
+  }
+
   return (
     <div className={cn("space-y-4", className)}>
       <Card className="border-gray-800 bg-[#2a2b2d]">
@@ -173,6 +182,24 @@ export function Feed({ className }: FeedProps) {
             {imageFile && (
               <span className="text-xs text-white">{imageFile.name}</span>
             )}
+             <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
+              <SmilePlus/>
+              <input className="hidden"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              >
+              </input>
+              </label>
+              <div className="relative emoji-picker-container">
+            <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}> 
+            </button>
+            {showEmojiPicker && (
+            <div className="absolute top-1 left-0 z-50">
+              <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
+              <EmojiPicker onEmojiClick={handleEmojiClick} height={300} width={370} />
+              </label>
+            </div>
+          )}
+            </div>
           </div>
 
           <Button
@@ -271,7 +298,3 @@ export function Feed({ className }: FeedProps) {
     </div>
   );
 }
-// passo 1: determinar os dados da interface igual o do schema do banco de dados (./backend/src/models) (ok)
-// passo 2: verificar como os dados está saindo das rota de post, dar um try catch na rota pra verificar
-// passo 3: pegar os dados da api e usar com a interface que você criou
-// passo 4: tirar todo o schema de follow e colocar ele dentro de User (mas espera o grupo decidir antes)
