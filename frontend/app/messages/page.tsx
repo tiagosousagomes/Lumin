@@ -292,7 +292,7 @@ export default function MessagesPage() {
                       </div>
                       <p className="line-clamp-1 text-sm text-gray-400">{contact.lastMessage}</p>
                     </div>
-                    {contact.unread && <div className="h-2 w-2 rounded-full bg-[#01dafd]" aria-hidden="true" />}
+                    {contact.unread && <div className="h-2 w-2 rounded-full bg-[#4B7CCC]" aria-hidden="true" />}
                   </button>
                 ))}
               </div>
@@ -336,7 +336,7 @@ export default function MessagesPage() {
                       >
                         <div
                           className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                            message.senderId === "me" ? "bg-[#01dafd] text-black" : "bg-[#2a2b2d] text-white"
+                            message.senderId === "me" ? "bg-[#4B7CCC] text-black" : "bg-[#2a2b2d] text-white"
                           }`}
                         >
                           <p>{message.text}</p>
@@ -354,7 +354,7 @@ export default function MessagesPage() {
                   <Input
                     type="text"
                     placeholder="Type a message..."
-                    className="bg-[#2a2b2d] text-white placeholder:text-gray-400 focus-visible:ring-[#01dafd]"
+                    className="bg-[#2a2b2d] text-white placeholder:text-gray-400 focus-visible:ring-[#4B7CCC]"
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     onKeyDown={(e) => {
@@ -367,7 +367,7 @@ export default function MessagesPage() {
                   />
                   <Button
                     size="icon"
-                    className="bg-[#01dafd] text-black hover:bg-[#01dafd]/90"
+                    className="bg-[#4B7CCC] text-black hover:bg-[#4B7CCC]/90"
                     onClick={handleSendMessage}
                     disabled={!messageText.trim() || !isConnected}
                   >
