@@ -53,15 +53,15 @@ Pré-requisitos
 Frontend: cd frontend && npm run dev</p>
 
 ## 6. Acesse a aplicação
-<p>Abra [http://localhost:3000](http://localhost:3000) no navegador.</p>
+<p>Abra http://localhost:3000 no navegador.</p>
 
 ## ✉️ Contato
 <p>Dúvidas ou sugestões? Entre em contato comigo.<br></p>
 <p>📧 tiagosousagomes14@gmail.com<br></p>
 <p>🌐 @tiagosousagomes<br></p>
 
-
-
+<p></p>
+<p></p>
 
 <p>💡 O Lumin está em constante evolução. Junte-se a nós e faça parte dessa rede! 🚀<br></p>
 
