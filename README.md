@@ -67,4 +67,7 @@ Frontend: cd frontend && npm run dev</p>
 
 ✨ Deixe uma ⭐ no repositório se você gostou do projeto! ✨
 
-#RedeSocial #React #NodeJS #MongoDB #OpenSource
+## 🏷️ Tags  
+![#OpenSource](https://img.shields.io/badge/-#OpenSource-ff69b4)  
+![#React](https://img.shields.io/badge/-#React-61DAFB)  
+![#NodeJS](https://img.shields.io/badge/-#NodeJS-339933)  
