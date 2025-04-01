@@ -27,7 +27,7 @@ Pré-requisitos
 - MongoDB (local ou atlas)
 - Git
 
-# Passo a Passo
+# 👣 Passo a Passo
 ## 1. Clone o repositório
    <p>git clone https://github.com/tiagosousagomes/Lumin.git <br>
    cd Lumin</p>
