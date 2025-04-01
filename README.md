@@ -29,12 +29,12 @@ Pré-requisitos
 
 # Passo a Passo
 ## 1. Clone o repositório
-   git clone https://github.com/tiagosousagomes/Lumin.git
-   cd Lumin
+   <p>git clone https://github.com/tiagosousagomes/Lumin.git <br>
+   cd Lumin</p>
 
 ## 2. Instale as depedências
-   cd frontend && npm install
-   cd ../backend && npm install
+   <p>cd frontend && npm install<br>
+   cd ../backend && npm install</p>
 
 ## 3. Configure seu banco de dados
 
@@ -44,23 +44,23 @@ Pré-requisitos
 
 ## 4.Crie o arquivo .env no backend
 
-  MONGODB_URI=sua_string_de_conexao_aqui  
-  JWT_SECRET=uma_chave_secreta_forte 
+  <p>MONGODB_URI=sua_string_de_conexao_aqui<br>  
+  JWT_SECRET=uma_chave_secreta_forte</p>
 
 ## 5. Inicie os servidores
 
-Backend: cd backend && node main.js
-Frontend: cd frontend && npm run dev
+<p>Backend: cd backend && node main.js<br>
+Frontend: cd frontend && npm run dev</p>
 
 ## 6. Acesse a aplicação
-Abra [http://localhost:3000](http://localhost:3000) no navegador.
+<p>Abra [http://localhost:3000](http://localhost:3000) no navegador.</p>
 
 ## ✉️ Contato
-Dúvidas ou sugestões? Entre em contato comigo.
-📧 tiagosousagomes14@gmail.com
-🌐 @tiagosousagomes
+<p>Dúvidas ou sugestões? Entre em contato comigo.<br></p>
+<p>📧 tiagosousagomes14@gmail.com<br></p>
+<p>🌐 @tiagosousagomes<br></p>
 
-💡 O Lumin está em constante evolução. Junte-se a nós e faça parte dessa rede! 🚀
+<p>💡 O Lumin está em constante evolução. Junte-se a nós e faça parte dessa rede! 🚀<br></p>
 
 <div align="center"> <img src="https://img.shields.io/github/stars/seu-usuario/Lumin?style=social" alt="Stars"> <img src="https://img.shields.io/github/forks/seu-usuario/Lumin?style=social" alt="Forks"> </div>
 ✨ Deixe uma ⭐ no repositório se você gostou do projeto! ✨
