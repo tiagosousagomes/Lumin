@@ -3,12 +3,12 @@ Bem-vindo ao Lumin, uma rede social desenvolvida para conectar pessoas de maneir
 desde o banco de dados, até o frontend.
 
 # 🚀 Recursos Principais do Lumin
-🚧 (Em construção) Perfil de Usuário – Personalize seu perfil com foto, bio e informações pessoais.
-✅ Postagens e Feed – Compartilhe momentos, fotos e ideias com seus amigos.
-🚧(Em construção) Curtidas e Comentários – Interaja com as publicações de outros usuários.
-🚧(Em construção) Sistema de Amizades – Adicione amigos e acompanhe suas atividades.
-✅ Mensagens Privadas – Converse em tempo real com outros usuários.
-✅ Responsivo – Acessível em dispositivos móveis e desktop.
+<p>🚧 (Em construção) Perfil de Usuário – Personalize seu perfil com foto, bio e informações pessoais.<br></p>
+<p>✅ Postagens e Feed – Compartilhe momentos, fotos e ideias com seus amigos.<br></p>
+<p>🚧(Em construção) Curtidas e Comentários – Interaja com as publicações de outros usuários.<br></p>
+<p>🚧(Em construção) Sistema de Amizades – Adicione amigos e acompanhe suas atividades.<br></p>
+<p>✅ Mensagens Privadas – Converse em tempo real com outros usuários.<br></p>
+<p>✅ Responsivo – Acessível em dispositivos móveis e desktop.<br></p>
 
 # 🛠️ Tecnologias Utilizadas
 Frontend: React,TypeScript, nextJS, TailwindCSS
@@ -53,7 +53,7 @@ Backend: cd backend && node main.js
 Frontend: cd frontend && npm run dev
 
 ## 6. Acesse a aplicação
-Abra [http://localhost:3000] no navegador.
+Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
 ## ✉️ Contato
 Dúvidas ou sugestões? Entre em contato comigo.
