@@ -52,8 +52,8 @@ Pré-requisitos
 <p>Backend: cd backend && node main.js<br>
 Frontend: cd frontend && npm run dev</p>
 
-## 6. Acesse a aplicação
-<p>Abra http://localhost:3000 no navegador.</p>
+## 🔗6. Acesse a aplicação localmente: [http://localhost:3000](http://localhost:3000)  
+*(Disponível apenas após iniciar o servidor frontend)*  
 
 ## ✉️ Contato
 <p>Dúvidas ou sugestões? Entre em contato comigo.<br></p>
