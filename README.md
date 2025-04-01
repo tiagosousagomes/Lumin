@@ -60,9 +60,11 @@ Frontend: cd frontend && npm run dev</p>
 <p>📧 tiagosousagomes14@gmail.com<br></p>
 <p>🌐 @tiagosousagomes<br></p>
 
+
+
+
 <p>💡 O Lumin está em constante evolução. Junte-se a nós e faça parte dessa rede! 🚀<br></p>
 
-<div align="center"> <img src="https://img.shields.io/github/stars/seu-usuario/Lumin?style=social" alt="Stars"> <img src="https://img.shields.io/github/forks/seu-usuario/Lumin?style=social" alt="Forks"> </div>
 ✨ Deixe uma ⭐ no repositório se você gostou do projeto! ✨
 
 #RedeSocial #React #NodeJS #MongoDB #OpenSource
