@@ -1,6 +1,6 @@
-Lumin - Conecte-se com o mundo
-Bem-vindo ao Lumin, uma rede social desenvolvida para conectar pessoas de maneira simples e divertida! Este projeto foi criado com o objetivo de fazer uma aplicação do zero, 
-desde o banco de dados, até o frontend.
+<p>Lumin - Conecte-se com o mundo<br></p>
+<p>Bem-vindo ao Lumin, uma rede social desenvolvida para conectar pessoas de maneira simples e divertida! Este projeto foi criado com o objetivo de fazer uma aplicação do zero,<br></p> 
+<p>desde o banco de dados, até o frontend.</p>
 
 # 🚀 Recursos Principais do Lumin
 <p>🚧 (Em construção) Perfil de Usuário – Personalize seu perfil com foto, bio e informações pessoais.<br></p>
