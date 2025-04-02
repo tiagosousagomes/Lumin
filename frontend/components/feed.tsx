@@ -1,18 +1,18 @@
 "use client";
 
-import {Heart, MessageCircle,MoreHorizontal,Repeat,Share, SmilePlus} from "lucide-react";
+import { Heart, MessageCircle, MoreHorizontal, Repeat, Share, SmilePlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card,  CardContent,  CardFooter, CardHeader,} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
-import EmojiPicker, { EmojiClickData } from 'emoji-picker-react'
-
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+import { toggleLike } from "../services/postService"; // Importa o serviço de likes
 
 interface Like {
   _id: string;
@@ -40,10 +40,10 @@ interface Post {
   author: User;
   likes: Like[];
   comments: Comments[];
-  image:{
+  image: {
     data: Buffer;
     contentType: string;
-  }
+  };
 }
 
 interface responsePost {
@@ -55,8 +55,8 @@ interface FeedProps {
   className?: string;
 }
 
-interface jwtPayload{
-  userId: string,
+interface jwtPayload {
+  userId: string;
 }
 
 export function Feed({ className }: FeedProps) {
@@ -101,9 +101,6 @@ export function Feed({ className }: FeedProps) {
       const response = await fetch("http://localhost:3001/api/post", {
         method: "POST",
         body: formData,
-        // headers: {
-        //   Authorization: `Bearer ${token}`, // se o backend exigir token
-        // },
       });
 
       const data = await response.json();
@@ -126,23 +123,44 @@ export function Feed({ className }: FeedProps) {
     }
   };
 
-  // Adicione no início do componente
-useEffect(() => {
-  const handleClickOutside = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.emoji-picker-container') && !target.closest('.emoji-button')) {
-      setShowEmojiPicker(false);
-    }
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        !target.closest(".emoji-picker-container") &&
+        !target.closest(".emoji-button")
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setPostContent((prev) => prev + emojiData.emoji);
+    setShowEmojiPicker(false);
   };
 
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => document.removeEventListener('mousedown', handleClickOutside);
-}, []);
+  const handleToggleLike = async (postId: string) => {
+    const token = Cookies.get("access_token");
+    if (!token) return alert("Usuário não autenticado");
 
-  const handleEmojiClick = (emojiData: EmojiClickData) =>{
-    setPostContent(prev => prev + emojiData.emoji);
-    setShowEmojiPicker(false)
-  }
+    const decoded: jwtPayload = jwtDecode(token);
+    const userId = decoded.userId;
+
+    try {
+      const updatedPost = await toggleLike(postId, userId);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId ? { ...post, likes: updatedPost.likes } : post
+        )
+      );
+    } catch (error) {
+      console.error("Erro ao alternar like:", error);
+    }
+  };
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -169,7 +187,6 @@ useEffect(() => {
 
         <CardFooter className="flex justify-between items-center border-t border-gray-800 pt-4">
           <div className="flex items-center gap-2">
-            {/* Botão de upload */}
             <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
               <ImageIcon />
               <input
@@ -182,30 +199,33 @@ useEffect(() => {
             {imageFile && (
               <span className="text-xs text-white">{imageFile.name}</span>
             )}
-             <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
-              <SmilePlus/>
-              <input className="hidden"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              >
-              </input>
-              </label>
-              <div className="relative emoji-picker-container">
-            <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}> 
-            </button>
-            {showEmojiPicker && (
-            <div className="absolute top-1 left-0 z-50">
-              <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
-              <EmojiPicker onEmojiClick={handleEmojiClick} height={400} width={500} />
-              </label>
-            </div>
-          )}
+            <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
+              <SmilePlus />
+              <input
+                className="hidden"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              ></input>
+            </label>
+            <div className="relative emoji-picker-container">
+              <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}></button>
+              {showEmojiPicker && (
+                <div className="absolute top-1 left-0 z-50">
+                  <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
+                    <EmojiPicker
+                      onEmojiClick={handleEmojiClick}
+                      height={400}
+                      width={500}
+                    />
+                  </label>
+                </div>
+              )}
             </div>
           </div>
 
           <Button
             className="rounded-full bg-[#4B7CCC] text-black hover:bg-[#4B7CCC]/90"
             disabled={!postContent.trim()}
-            onClick={handleCreatePost} // ← Função que vai fazer a requisição
+            onClick={handleCreatePost}
           >
             Post
           </Button>
@@ -250,7 +270,9 @@ useEffect(() => {
               {post.image && post.image.data && (
                 <div className="mt-3 overflow-hidden rounded-xl">
                   <Image
-                    src={`data:${post.image.contentType};base64,${Buffer.from(post.image.data).toString("base64")}`}
+                    src={`data:${post.image.contentType};base64,${Buffer.from(
+                      post.image.data
+                    ).toString("base64")}`}
                     alt="Post attachment"
                     className="h-auto w-full object-cover"
                     width={500}
@@ -263,23 +285,12 @@ useEffect(() => {
               <Button
                 variant="muted"
                 size="sm"
-                className="gap-1 text-gray-400 hover:text-[#108CD9]"
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span>{post.comments.length}</span>
-              </Button>
-              <Button
-                variant="muted"
-                size="sm"
-                className="gap-1 text-gray-400 hover:text-green-500"
-              >
-                <Repeat className="h-4 w-4" />
-                <span>0</span>
-              </Button>
-              <Button
-                variant="muted"
-                size="sm"
-                className="gap-1 text-gray-400 hover:text-red-500"
+                className={`gap-1 ${
+                  post.likes.some((like) => like?.user === Cookies.get("userId"))
+                    ? "text-red-500"
+                    : "text-gray-400"
+                } hover:text-red-500`}
+                onClick={() => handleToggleLike(post._id)}
               >
                 <Heart className="h-4 w-4" />
                 <span>{post.likes.length}</span>

@@ -231,47 +231,47 @@ const deletePost = async (req, res) => {
 	}
 };
 
-// Adicionar rota para curtir/descurtir um post
+
 const likePost = async (req, res) => {
-	try {
-		const postID = req.params.id;
-		const userID = req.body.userId;
+    try {
+        const postID = req.params.id; 
+        const userID = req.body.userId; ão
 
-		// Verifica se o post existe
-		const post = await Post.findById(postID);
-		if (!post) {
-			return res.status(404).json({
-				success: false,
-				message: "Post não encontrado"
-			});
-		}
+        // Verifica se o post existe
+        const post = await Post.findById(postID);
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post não encontrado",
+            });
+        }
 
-		// Verifica se o usuário já curtiu o post
-		const index = post.likes.indexOf(userID);
+        
+        const index = post.likes.indexOf(userID);
 
-		if (index === -1) {
-			// Adiciona o like
-			post.likes.push(userID);
-		} else {
-			// Remove o like (descurtir)
-			post.likes.splice(index, 1);
-		}
+        if (index === -1) {
+            post.likes.push(userID);
+        } else {
+            post.likes.splice(index, 1);
+        }
 
-		await post.save();
+      
+        await post.save();
 
-		res.status(200).json({
-			success: true,
-			message: index === -1 ? "Post curtido com sucesso" : "Post descurtido com sucesso",
-			liked: index === -1,
-			likesCount: post.likes.length
-		});
-	} catch (err) {
-		res.status(500).json({
-			success: false,
-			message: "Erro ao processar a curtida",
-			error: err.message
-		});
-	}
+        res.status(200).json({
+            success: true,
+            message: index === -1 ? "Post curtido com sucesso" : "Post descurtido com sucesso",
+            liked: index === -1,
+            likesCount: post.likes.length,
+            likes: post.likes, 
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao processar a curtida",
+            error: err.message,
+        });
+    }
 };
 
 module.exports = {
