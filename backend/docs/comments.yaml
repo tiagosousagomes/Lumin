@@ -125,7 +125,7 @@ paths:
                             username:
                               type: string
                               example: "joaosilva"
-                            profilePicture:
+                            avatar:
                               type: string
                               example: "https://example.com/profile.jpg"
                         content:

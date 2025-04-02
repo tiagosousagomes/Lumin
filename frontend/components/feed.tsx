@@ -195,7 +195,7 @@ useEffect(() => {
             {showEmojiPicker && (
             <div className="absolute top-1 left-0 z-50">
               <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
-              <EmojiPicker onEmojiClick={handleEmojiClick} height={300} width={370} />
+              <EmojiPicker onEmojiClick={handleEmojiClick} height={400} width={500} />
               </label>
             </div>
           )}

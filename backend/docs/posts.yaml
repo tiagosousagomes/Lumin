@@ -357,7 +357,7 @@ components:
           type: string
         username:
           type: string
-        profilePicture:
+        avatar:
           type: string
     
     Comment:
