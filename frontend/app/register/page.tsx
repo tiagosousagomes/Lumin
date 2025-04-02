@@ -94,7 +94,7 @@ export default function RegisterPage() {
     setTimeout(() => {
       // Redirecionar para a página principal
       router.push("/")
-    }, 5000)
+    }, 3000)
   }
 
   return (
