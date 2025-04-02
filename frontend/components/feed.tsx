@@ -282,19 +282,36 @@ export function Feed({ className }: FeedProps) {
               )}
             </CardContent>
             <CardFooter className="flex justify-between py-2">
+              {/* Botão de Like */}
               <Button
                 variant="muted"
                 size="sm"
                 className={`gap-1 ${
-                  post.likes.some((like) => like?.user === Cookies.get("userId"))
+                  post.likes.filter((like) => like !== null).some((like) => like?.user === Cookies.get("userId"))
                     ? "text-red-500"
                     : "text-gray-400"
                 } hover:text-red-500`}
                 onClick={() => handleToggleLike(post._id)}
               >
-                <Heart className="h-4 w-4" />
-                <span>{post.likes.length}</span>
+                {post.likes.filter((like) => like !== null).some((like) => like?.user === Cookies.get("userId")) ? (
+                  <Heart className="h-4 w-4 fill-current" /> 
+                ) : (
+                  <Heart className="h-4 w-4" /> 
+                )}
+                <span>{post.likes.filter((like) => like !== null).length}</span>
               </Button>
+
+              {/* Botão de Comentários */}
+              <Button
+                variant="muted"
+                size="sm"
+                className="gap-1 text-gray-400 hover:text-[#108CD9]"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>{post.comments.length}</span>
+              </Button>
+
+              {/* Botão de Compartilhar */}
               <Button
                 variant="muted"
                 size="sm"
