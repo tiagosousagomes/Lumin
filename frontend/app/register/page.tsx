@@ -79,7 +79,7 @@ export default function RegisterPage() {
       Cookies.set("access_token", accessToken, { expires: rememberMe ? 7 : undefined }); 
       Cookies.set("refresh_token", refreshToken, { expires: 7 });
 
-      router.push("/");
+      
     }catch{
 
     }
