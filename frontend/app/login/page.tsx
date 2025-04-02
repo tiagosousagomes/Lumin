@@ -27,10 +27,12 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
 
     try {
       const response = await fetch("http://localhost:3001/api/login", {
@@ -38,25 +40,18 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message || "Erro desconhecido");
-
       const { accessToken, refreshToken } = data;
-
-      Cookies.set("access_token", accessToken, { expires: rememberMe ? 7 : undefined }); 
+      Cookies.set("access_token", accessToken, { expires: rememberMe ? 7 : undefined });
       Cookies.set("refresh_token", refreshToken, { expires: 7 });
-
       router.push("/");
-
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erro desconhecido");
+      setErrorMessage(err instanceof Error ? err.message : "Erro desconhecido");
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#222325] p-4">
@@ -75,6 +70,11 @@ export default function LoginPage() {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {errorMessage && (
+                <div className="rounded-md bg-red-900/20 p-3 text-sm text-red-300">
+                  {errorMessage}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-white">
                   Email
@@ -131,7 +131,6 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center space-x-2">
-                
                 <Checkbox
                   id="remember"
                   checked={rememberMe}
@@ -139,7 +138,7 @@ export default function LoginPage() {
                   className="border-white data-[state=checked]:bg-[#4B7CCC] data-[state=checked]:text-[#ffffff]"
                 />
                 <Label
-                  htmlFor="remember" 
+                  htmlFor="remember"
                   className="text-sm font-normal text-white"
                 >
                   Lembrar de mim
