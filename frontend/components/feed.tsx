@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, MessageCircle, MoreHorizontal, Repeat, Share, SmilePlus } from "lucide-react";
+import { Heart, MessageCircle, MoreHorizontal, Share, SmilePlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
