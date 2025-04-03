@@ -122,8 +122,6 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-
-
 // Exportando as funções
 module.exports = {
   createUser,

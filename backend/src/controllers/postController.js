@@ -274,6 +274,10 @@ const likePost = async (req, res) => {
     }
 };
 
+const promptWithGemini = async (req, res) => {
+	
+}
+
 module.exports = {
 	createPost: [upload.single("image"), createPost],
 	getAllPosts,
@@ -281,5 +285,6 @@ module.exports = {
 	getPostById,
 	updatePost: [upload.single("image"), updatePost],
 	deletePost,
-	likePost
+	likePost,
+	promptWithGemini,
 };
