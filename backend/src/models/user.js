@@ -29,15 +29,6 @@ let userSchema = new mongoose.Schema({
 		type: String,
 		default: ""
 	},
-	createdAt: {
-		type: Date,
-		default: Date.now
-	},
-	updateAt: {
-		type: Date,
-		default: Date.now
-	},
-
 	email: {
 		type: String,
 		required: true,
@@ -57,11 +48,16 @@ let userSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
 	}],
+},{
+	timestamps:true
 });
 
+	
 userSchema.pre("save", function(next) {
 	this.updatedAt = Date.now();
 	next();
 });
+
+
 
 module.exports = mongoose.model("user", userSchema);

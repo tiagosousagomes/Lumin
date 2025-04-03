@@ -16,14 +16,8 @@ let commentSchema = new mongoose.Schema({
 		required: [true, "O conteúdo do comentário é obrigatório"],
 		minlength: [1, "O conteúdo do comentário não pode ser vazio"],
 	},
-	createAt: {
-		type: Date,
-		default: Date.now
-	},
-	updateAt: {
-		type: Date,
-		default: Date.now
-	},
+},{
+	timestamps:true
 });
 
 commentSchema.pre("save", function(next) {

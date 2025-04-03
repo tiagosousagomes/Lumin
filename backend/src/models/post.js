@@ -29,15 +29,10 @@ const postSchema = new mongoose.Schema({
             default: [],
         },
     ],
-    createAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updateAt: {
-        type: Date,
-        default: Date.now,
-    },
-});
+},{
+    timestamps:true
+}
+);
 
 postSchema.pre("save", function (next) {
     this.updateAt = Date.now();
