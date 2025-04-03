@@ -23,12 +23,9 @@ let messageSchema = new mongoose.Schema({
 		type: String,
 		default: true
 	},
-	createAt: {
-		type: Date,
-		default: Date.now
-	},
-}, {
-	createAt: true
+}, 
+{
+	timestamps:true
 });
 
 module.exports = mongoose.model("message", messageSchema);

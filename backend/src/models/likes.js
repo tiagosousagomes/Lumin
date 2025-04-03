@@ -11,10 +11,10 @@ let likeSchema = new mongoose.Schema({
 		ref: "post",
 		required: true
 	},
-	createAt: {
-		type: Date,
-		default: Date.now
-	},
-});
+	
+},{
+	timestamps:true
+}
+);
 
 module.exports = mongoose.model("like", likeSchema);
