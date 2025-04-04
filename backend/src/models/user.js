@@ -52,12 +52,5 @@ let userSchema = new mongoose.Schema({
 	timestamps:true
 });
 
-	
-userSchema.pre("save", function(next) {
-	this.updatedAt = Date.now();
-	next();
-});
-
-
 
 module.exports = mongoose.model("user", userSchema);

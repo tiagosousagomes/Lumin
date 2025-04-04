@@ -34,11 +34,6 @@ const postSchema = new mongoose.Schema({
 }
 );
 
-postSchema.pre("save", function (next) {
-    this.updateAt = Date.now();
-    next();
-});
-
 postSchema.methods.toggleLike = async function (userId) {
     const likeIndex = this.likes.indexOf(userId);
 

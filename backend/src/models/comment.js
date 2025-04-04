@@ -20,9 +20,4 @@ let commentSchema = new mongoose.Schema({
 	timestamps:true
 });
 
-commentSchema.pre("save", function(next) {
-	this.updateAt = Date.now();
-	next();
-});
-
 module.exports = mongoose.model("comment", commentSchema);
