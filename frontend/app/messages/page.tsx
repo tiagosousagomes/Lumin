@@ -48,6 +48,16 @@ interface FollowingResponse {
     following: User;
   }>;
 }
+interface ApiMessageResponse {
+  success: boolean;
+  message: string;
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  createdAt: string;
+
+}
 
 export default function MessagesPage() {
   const [selectedChat, setSelectedChat] = useState<string | null>(null)
@@ -125,7 +135,7 @@ export default function MessagesPage() {
         const data = await response.json()
         
         if (data.success && data.messages) {
-          const formattedMessages = data.messages.map((msg: any) => ({
+          const formattedMessages = data.messages.map((msg:ApiMessageResponse ) => ({
             id: msg._id,
             senderId: msg.senderId === userId ? "me" : msg.senderId,
             receiverId: msg.receiverId,
@@ -185,9 +195,7 @@ export default function MessagesPage() {
         )
         
         // Optional: Show notification for new message
-        if (data.senderId !== selectedChat) {
-          const sender = contacts.find(c => c.id === data.senderId)
-        }
+  
       }
     })
 
@@ -377,7 +385,7 @@ export default function MessagesPage() {
                 </div>
                 {!isConnected && (
                   <p className="mt-2 text-center text-xs text-red-400">
-                    You're currently offline. Messages can't be sent until connection is restored.
+                    You are currently offline. Messages will be sent when you reconnect.
                   </p>
                 )}
               </div>
