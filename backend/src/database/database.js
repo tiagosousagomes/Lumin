@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
+const chalk = require("chalk");
 
 class Database {
 	constructor(connectionString) {
 		if (!connectionString) {
-			throw new error("Connection is a required!");
+			throw new Error("Connection is required!");
 		}
 		this.connectionString = connectionString;
 		this.connection = null;
@@ -15,22 +16,22 @@ class Database {
 				useNewUrlParser: true,
 				useUnifiedTopology: true,
 			});
-			console.log("Database Connect!");
+			console.log(chalk.green("[MongoDB] Connected successfully."));
 			this.connection = mongoose.connection;
 
 			this.connection.on("connected", () => {
-				console.log("Mongoose connected to DB");
+				console.log(chalk.green("[MongoDB] Mongoose connected to DB"));
 			});
 
-			this.connection.on("disconnect", () => {
-				console.log("Mongoose disconnect from DB");
+			this.connection.on("disconnected", () => {
+				console.log(chalk.red("[MongoDB] Mongoose disconnected from DB"));
 			});
 
-			this.connection.on("error", () => {
-				console.log("Mongoose connection error:", err.message);
+			this.connection.on("error", (err) => {
+				console.log(chalk.red("[MongoDB] Connection error:", err.message));
 			});
 		} catch (err) {
-			console.log("Database connection error:", err.message);
+			console.log(chalk.red("[MongoDB] Initial connection error:", err.message));
 			throw err;
 		}
 	}
@@ -38,13 +39,13 @@ class Database {
 	async disconnect() {
 		if (this.connection) {
 			await this.connection.close();
-			console.log("Mongoose disconnected from DB");
+			console.log(chalk.yellow("[MongoDB] Mongoose disconnected from DB"));
 		}
 	}
 
 	getConnection() {
 		if (!this.connection) {
-			throw new error("No active connection BD");
+			throw new Error("No active connection to the database.");
 		}
 		return this.connection;
 	}
@@ -55,6 +56,7 @@ let instance = null;
 module.exports = (connectionString) => {
 	if (!instance) {
 		instance = new Database(connectionString);
+		Object.freeze(instance);
 	}
 	return instance;
 };
