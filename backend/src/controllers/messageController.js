@@ -167,7 +167,6 @@ const getMessagesBetweenUsers = async (req, res) => {
       messages: messages
     });
   } catch (error) {
-    console.error('Error fetching messages between users:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch messages',

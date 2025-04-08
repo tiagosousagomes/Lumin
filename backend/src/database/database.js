@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const chalk = require("chalk");
+const logger = require('../utils/utils')
 
 class Database {
 	constructor(connectionString) {
@@ -16,22 +16,22 @@ class Database {
 				useNewUrlParser: true,
 				useUnifiedTopology: true,
 			});
-			console.log(chalk.green("[MongoDB] Connected successfully."));
+			logger.db("[MongoDB] Connected successfully.");
 			this.connection = mongoose.connection;
 
 			this.connection.on("connected", () => {
-				console.log(chalk.green("[MongoDB] Mongoose connected to DB"));
+				logger.db("[MongoDB] Mongoose connected to DB");
 			});
 
 			this.connection.on("disconnected", () => {
-				console.log(chalk.red("[MongoDB] Mongoose disconnected from DB"));
+				logger.info("[MongoDB] Mongoose disconnected from DB");
 			});
 
 			this.connection.on("error", (err) => {
-				console.log(chalk.red("[MongoDB] Connection error:", err.message));
+				logger.error("[MongoDB] Connection error:", err.message);
 			});
 		} catch (err) {
-			console.log(chalk.red("[MongoDB] Initial connection error:", err.message));
+			logger.error("[MongoDB] Initial connection error:", err.message);
 			throw err;
 		}
 	}
@@ -39,7 +39,7 @@ class Database {
 	async disconnect() {
 		if (this.connection) {
 			await this.connection.close();
-			console.log(chalk.yellow("[MongoDB] Mongoose disconnected from DB"));
+			logger.info("[MongoDB] Mongoose disconnected from DB");
 		}
 	}
 

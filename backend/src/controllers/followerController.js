@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 const Follower = require("../models/followers");
 const User = require("../models/user");
+const logger = require("../utils/utils");
 
 const followUser = async (req, res) => {
   try {
     const { followerID, followingID } = req.body;
     
-    console.log("Follow request:", { followerID, followingID });
+    logger.info("Follow request:", { followerID, followingID });
     
     // Skip validation if IDs are undefined
     if (!followerID || !followingID) {
@@ -68,7 +69,6 @@ const followUser = async (req, res) => {
       message: "Usuário seguido com sucesso",
     });
   } catch (err) {
-    console.error("Error in followUser:", err);
     res.status(500).json({
       success: false,
       message: "Erro ao seguir usuário",

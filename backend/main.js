@@ -11,6 +11,7 @@ const commentRoutes = require('./src/routes/commentRoute');
 const messagesRoutes = require('./src/routes/messageRoute');
 const followerRoutes = require('./src/routes/followerRoute');
 const { swaggerUi, specs } = require("./swagger");
+const logger = require('./src/utils/utils')
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ app.use(cors({
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log('✅ Banco de dados conectado com sucesso!');
+       logger.db('Banco conectado com sucesso')
 
         app.use('/api', userRoutes);
         app.use('/api', postRoutes);
@@ -40,10 +41,10 @@ mongoose.connect(process.env.MONGODB_URI)
 
         const PORT = process.env.PORT || 3001;
         server.listen(PORT, () => {
-            console.log(`🚀 Servidor rodando na porta ${PORT}`);
+            logger.routes(`Servidor rodando na porta ${PORT}`);
         });
     })
     .catch(err => {
-        console.error('❌ Falha ao conectar com o banco de dados', err.message);
+        logger.error('[MongoDB]Falha ao conectar com o banco de dados', err.message);
         process.exit(1);
     });

@@ -59,8 +59,7 @@ const getUserById = async (req, res, next) => {
   try {
     const userID = req.params.id;
     const users = await User.findById(userID);
-
-    console.log(users);
+    
     if (!users) {
      return res.status(404).json({
         success: false,

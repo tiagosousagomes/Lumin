@@ -38,7 +38,6 @@ const likePost = async (req, res) => {
             likes: post.likes,
         });
     } catch (err) {
-        console.error("Erro ao processar a curtida:", err);
         res.status(500).json({
             success: false,
             message: "Erro ao processar a curtida",

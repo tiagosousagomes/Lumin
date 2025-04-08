@@ -1,4 +1,5 @@
 const { Server } = require('socket.io');
+const logger = require('./src/utils/utils');
 
 let io;
 const users = {};
@@ -14,7 +15,7 @@ const initializeSocket = (server) => {
     });
 
     io.on("connection", (socket) => {
-        console.log("User connected:", socket.id);
+        logger.info("[User] User connected:", socket.id);
 
         // Match event names with frontend
         socket.on("add_user", (userId) => {
@@ -36,7 +37,7 @@ const initializeSocket = (server) => {
         });
 
         socket.on("disconnect", () => {
-            console.log("User disconnected:", socket.id);
+            logger.info("[User] User disconnected:", socket.id);
             const userId = Object.keys(users).find(key => users[key] === socket.id);
             if (userId) {
                 delete users[userId];
