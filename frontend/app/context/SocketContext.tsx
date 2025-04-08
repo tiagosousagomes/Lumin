@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Create socket connection with explicit options
-    const socketInstance = io("http://localhost:3001", {
+    const socketInstance = io(`${process.env.NEXT_PUBLIC_URL_SERVER}`, {
       withCredentials: true,
       transports: ["websocket", "polling"],
       reconnectionAttempts: 5,

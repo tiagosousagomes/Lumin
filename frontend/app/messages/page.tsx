@@ -89,7 +89,7 @@ export default function MessagesPage() {
       
       try {
         setLoading(true)
-        const response = await fetch(`http://localhost:3001/api/following/${userId}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_FOLLOWING}`)
         
         if (!response.ok) {
           throw new Error('Error fetching contacts')
@@ -126,7 +126,7 @@ export default function MessagesPage() {
       
       try {
         setLoading(true)
-        const response = await fetch(`http://localhost:3001/api/messages/${userId}/${selectedChat}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_MESSAGE}`)
         
         if (!response.ok) {
           throw new Error('Error fetching messages')

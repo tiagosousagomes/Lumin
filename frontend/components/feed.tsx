@@ -68,7 +68,7 @@ export function Feed({ className }: FeedProps) {
   useEffect(() => {
     const fetchResponse = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/post");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_POST}`);
         const data: responsePost = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
@@ -98,7 +98,7 @@ export function Feed({ className }: FeedProps) {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/api/post", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_POST}`, {
         method: "POST",
         body: formData,
       });

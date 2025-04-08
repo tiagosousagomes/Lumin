@@ -20,7 +20,7 @@ const server = http.createServer(app);
 
 app.use(express.json());
 app.use(cors({
-    origin: "http://localhost:3000", 
+    origin: `${process.env.URL_FRONT}`, 
     methods: ["GET", "POST"],
     credentials: true
 }));
@@ -39,12 +39,12 @@ mongoose.connect(process.env.MONGODB_URI)
 
         initializeSocket(server);
 
-        const PORT = process.env.PORT || 3001;
+        const PORT = process.env.PORT_CONNECT_SERVER;
         server.listen(PORT, () => {
             logger.routes(`Servidor rodando na porta ${PORT}`);
         });
     })
     .catch(err => {
-        logger.error('Falha ao conectar com o banco de dados', err.message);
+        logger.error('Falha ao conectar com o banco de dados', err.message);''
         process.exit(1);
     });
