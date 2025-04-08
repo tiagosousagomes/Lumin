@@ -7,7 +7,7 @@ const followUser = async (req, res) => {
   try {
     const { followerID, followingID } = req.body;
     
-    logger.info("Follow request:", { followerID, followingID });
+    logger.info("[BACKEND] Follow request:", { followerID, followingID });
     
     // Skip validation if IDs are undefined
     if (!followerID || !followingID) {

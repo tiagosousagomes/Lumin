@@ -16,22 +16,22 @@ class Database {
 				useNewUrlParser: true,
 				useUnifiedTopology: true,
 			});
-			logger.db("[MongoDB] Connected successfully.");
+			logger.db("Connected successfully.");
 			this.connection = mongoose.connection;
 
 			this.connection.on("connected", () => {
-				logger.db("[MongoDB] Mongoose connected to DB");
+				logger.db("Mongoose connected to DB");
 			});
 
 			this.connection.on("disconnected", () => {
-				logger.info("[MongoDB] Mongoose disconnected from DB");
+				logger.info("Mongoose disconnected from DB");
 			});
 
 			this.connection.on("error", (err) => {
-				logger.error("[MongoDB] Connection error:", err.message);
+				logger.error("Connection error:", err.message);
 			});
 		} catch (err) {
-			logger.error("[MongoDB] Initial connection error:", err.message);
+			logger.error("Initial connection error:", err.message);
 			throw err;
 		}
 	}
@@ -39,7 +39,7 @@ class Database {
 	async disconnect() {
 		if (this.connection) {
 			await this.connection.close();
-			logger.info("[MongoDB] Mongoose disconnected from DB");
+			logger.info(" Mongoose disconnected from DB");
 		}
 	}
 

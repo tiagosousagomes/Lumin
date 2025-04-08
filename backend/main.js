@@ -45,6 +45,6 @@ mongoose.connect(process.env.MONGODB_URI)
         });
     })
     .catch(err => {
-        logger.error('[MongoDB]Falha ao conectar com o banco de dados', err.message);
+        logger.error('Falha ao conectar com o banco de dados', err.message);
         process.exit(1);
     });
