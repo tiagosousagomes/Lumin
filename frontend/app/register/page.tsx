@@ -53,7 +53,7 @@ export default function RegisterPage() {
     setFormError("")
 
     try{
-      const registerResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_REGISTER}`,{
+      const registerResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/register`,{
         method:"POST",
         headers:{ "Content-Type": "application/json" },
         body:JSON.stringify({name,username, email, password})
@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
       if (!registerResponse.ok) throw new Error(dataRegisterResponse.message || "Erro desconhecido");
 
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_LOGIN}`, {
+      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

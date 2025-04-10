@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_AUTH_CONTEXT}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_AUTH_LOGIN}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
   }) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_AUTH_REGISTER}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

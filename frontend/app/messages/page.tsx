@@ -89,7 +89,7 @@ export default function MessagesPage() {
       
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_FOLLOWING}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/following/${userId}`)
         
         if (!response.ok) {
           throw new Error('Error fetching contacts')
@@ -126,7 +126,7 @@ export default function MessagesPage() {
       
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_MESSAGE}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}messages/${userId}/${selectedChat}`)
         
         if (!response.ok) {
           throw new Error('Error fetching messages')

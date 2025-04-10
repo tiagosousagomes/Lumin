@@ -1,5 +1,5 @@
 export async function toggleLike(postId: string, userId: string) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER_LIKE}`, {
+    const response = await fetch(`${process.env.URL_SERVER}/like/post/${postId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
