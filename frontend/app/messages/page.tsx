@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TopNavigation } from "@/components/top-navigation"
 
+
 interface Contact {
   id: string;
   name: string;
@@ -126,7 +127,7 @@ export default function MessagesPage() {
       
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}messages/${userId}/${selectedChat}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/messages/${userId}/${selectedChat}`)
         
         if (!response.ok) {
           throw new Error('Error fetching messages')

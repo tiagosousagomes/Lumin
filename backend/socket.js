@@ -7,7 +7,7 @@ const users = {};
 const initializeSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: `${process.env.URL_FRONT}`,
             methods: ["GET", "POST"],
             credentials: true  // Add this
         },
