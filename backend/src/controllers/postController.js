@@ -1,6 +1,7 @@
 const Post = require("../models/post");
 const User = require("../models/user");
 const multer = require("multer");
+const aiService = require("../Services/aiService")
 
 // Configuração do multer para armazenar a imagem na memória
 const storage = multer.memoryStorage();
@@ -275,7 +276,27 @@ const likePost = async (req, res) => {
 };
 
 const promptWithGemini = async (req, res) => {
-	
+	const { question } = req.body;
+
+	if (!question) {
+	  return res.status(400).json({ success: false, message: "Pergunta não fornecida" });
+	}
+  
+	try {
+	  const response = await aiService.prompt(question);
+  
+	  res.status(200).json({
+		success: true,
+		message: "AI response generated",
+		response,
+	  });
+	} catch (error) {
+	  console.error("AI error:", error);
+	  res.status(500).json({
+		success: false,
+		message: "Error generating response",
+	  });
+	}
 }
 
 module.exports = {
