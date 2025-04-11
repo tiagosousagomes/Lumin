@@ -1,7 +1,21 @@
+"use client";
+
 import { Feed } from "@/components/feed"
 import { Sidebar } from "@/components/sidebar"
 import { TopNavigation } from "@/components/top-navigation"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import Cookies from "js-cookie";
+
 export default function Home() {
+
+  const router = useRouter();
+  useEffect(() => {
+    const token = Cookies.get("access_token");
+    if (!token){
+      router.push("/")
+    }
+  }, [])
 
   const trends = [
     {
