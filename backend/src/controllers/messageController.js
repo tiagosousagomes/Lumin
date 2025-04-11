@@ -1,7 +1,8 @@
 const Message = require("../models/messages");
 const User = require("../models/user");
 const crypto = require("crypto");
-require("dotenv").config()
+require("dotenv").config();
+const aiService = require("../Services/aiService");
 // SISTEMA PARA CRIPTOGRAFIA DE MENSAGENS
 
 const SECRET_KEY = process.env.SECRET_KEY
@@ -175,10 +176,36 @@ const getMessagesBetweenUsers = async (req, res) => {
   }
 };
 
+
+const promptWithGemini = async (req, res) => {
+	const { question } = req.body;
+
+	if (!question) {
+	  return res.status(400).json({ success: false, message: "Pergunta não fornecida" });
+	}
+  
+	try {
+	  const response = await aiService.prompt(question);
+  
+	  res.status(200).json({
+		success: true,
+		message: "AI response generated",
+		response,
+	  });
+	} catch (error) {
+	  console.error("AI error:", error);
+	  res.status(500).json({
+		success: false,
+		message: "Error generating response",
+	  });
+	}
+}
+
 module.exports = {
   sendMessage,
   markMessageAsRead,
   getMessages,
   deleteMessage,
-  getMessagesBetweenUsers
+  getMessagesBetweenUsers,
+  promptWithGemini,
 };

@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Create socket connection with explicit options
-    const socketInstance = io("http://26.152.115.2:3001", {
+    const socketInstance = io("http://26.165.8.133:3001", {
       withCredentials: true,
       transports: ["websocket", "polling"],
       reconnectionAttempts: 5,
