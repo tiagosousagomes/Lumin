@@ -17,11 +17,17 @@ const aiService = {
             }]
         }
         
-        const result = await model.generateContent(p, {
-            timeout: 60000
-        });
-        
-        return result.response;
+        try {
+            const result = await model.generateContent(p, {
+                timeout: 60000
+            });
+            
+            const responseText = result.response.text();
+            return responseText;
+        } catch (error) {
+            console.error("Erro ao gerar conteúdo:", error);
+            throw error;
+        }
     },
     analysePrompt: () => {},
     sinthetizePrompt: () => {}
