@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TopNavigation } from "@/components/top-navigation"
-
+import ReactMarkdown from "react-markdown"
 
 interface Contact {
   id: string;
@@ -388,7 +388,9 @@ export default function MessagesPage() {
                             message.senderId === "me" ? "bg-[#4B7CCC] text-black" : "bg-[#2a2b2d] text-white"
                           }`}
                         >
-                          <p>{message.text}</p>
+                         <ReactMarkdown>
+                            {message.text}
+                        </ReactMarkdown>
                           <p className="mt-1 text-right text-xs opacity-70">{message.time}</p>
                         </div>
                       </div>
