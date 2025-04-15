@@ -21,7 +21,7 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(cors({
     origin: `${process.env.URL_FRONT}`, 
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
 
