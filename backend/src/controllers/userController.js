@@ -1,13 +1,23 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const multer = require("multer")
 
+const upload = multer ({
+  store: Storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+})
 
+const uploadImages = upload.fields([
+  { name: "avatar", maxCount: 1 },
+  { name: "headerImage", maxCount: 1 },
+]);
 
 const createUser = async (req, res, next) => {
   try {
-    // verifica se ja existe o email
+    const { name, username, email, password } = req.body;
 
-    const { name,username,email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -16,29 +26,41 @@ const createUser = async (req, res, next) => {
       });
     }
 
-    // Criar usuario
-
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const avatarFile = req.files?.avatar?.[0];
+    const headerImageFile = req.files?.headerImage?.[0];
 
     const user = new User({
       name,
       username,
       email,
       password: hashedPassword,
+      avatar: avatarFile
+        ? {
+            data: avatarFile.buffer,
+            contentType: avatarFile.mimetype,
+          }
+        : undefined,
+      headerImage: headerImageFile
+        ? {
+            data: headerImageFile.buffer,
+            contentType: headerImageFile.mimetype,
+          }
+        : undefined,
     });
+
     await user.save();
 
     res.status(201).json({
       success: true,
-      message: "Usuario criado com sucesso",
+      message: "Usuário criado com sucesso",
       data: user,
     });
   } catch (err) {
     next(err);
   }
 };
-
-//listar todos os usuarios
 
 const getAllUser = async (req, res, next) => {
   try {
@@ -53,8 +75,6 @@ const getAllUser = async (req, res, next) => {
   }
 };
 
-//  listar apenas um usuario
-
 const getUserById = async (req, res, next) => {
   try {
     const userID = req.params.id;
@@ -67,7 +87,7 @@ const getUserById = async (req, res, next) => {
       });
     }
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "Usuario correspondente ao ID:",
       data: users,
     });
@@ -76,32 +96,57 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-// Atualizar usuario
 const updateUser = async (req, res, next) => {
   try {
-    const { name, username, bio, profilePicture, email } = req.body;
-    const users = await User.findByIdAndUpdate(
-      req.params.id,
-      { name, email, username, bio, profilePicture },
-      { new: true, runValidators: true }
-    );
-    if (!users) {
-      return res.status(400).json({
+    const { name, username, bio, email, location } = req.body;
+
+    const avatarFile = req.files?.avatar?.[0];
+    const headerImageFile = req.files?.headerImage?.[0];
+
+    const updateData = {
+      name,
+      username,
+      bio,
+      email,
+      location,
+    };
+
+    if (avatarFile) {
+      updateData.avatar = {
+        data: avatarFile.buffer,
+        contentType: avatarFile.mimetype,
+      };
+    }
+
+    if (headerImageFile) {
+      updateData.headerImage = {
+        data: headerImageFile.buffer,
+        contentType: headerImageFile.mimetype,
+      };
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!user) {
+      return res.status(404).json({
         success: false,
-        message: "Usuario não encontrado",
+        message: "Usuário não encontrado",
       });
     }
+
     res.status(200).json({
       success: true,
-      message: "Usuario atualizado com sucesso!",
-      data: users,
+      message: "Usuário atualizado com sucesso!",
+      data: user,
     });
   } catch (err) {
     next(err);
   }
 };
 
-// deletar usuario
 const deleteUser = async (req, res, next) => {
   try {
     const users = await User.findByIdAndDelete(req.params.id);
@@ -121,11 +166,10 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-// Exportando as funções
 module.exports = {
-  createUser,
+  createUser: [uploadImages, createUser],
   getAllUser,
   getUserById,
-  updateUser,
+  updateUser: [uploadImages, updateUser],
   deleteUser,
 };

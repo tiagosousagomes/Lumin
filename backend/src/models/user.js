@@ -22,8 +22,8 @@ let userSchema = new mongoose.Schema({
 		},
 	},
 	avatar: {
-		type: String,
-		default: ""
+		data: Buffer,
+		contentType: String,
 	},
 	bio: {
 		type: String,
@@ -48,6 +48,14 @@ let userSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
 	}],
+	location: {
+		type: String,
+		default: ""
+	},
+	headerImage: {
+		data: Buffer,
+		contentType: String,
+	}
 },{
 	timestamps:true
 });
