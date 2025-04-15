@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const multer = require("multer")
 
 const upload = multer ({
-  store: Storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024
   }
