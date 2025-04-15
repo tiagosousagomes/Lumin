@@ -64,6 +64,7 @@ export function Feed({ className }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
     const fetchResponse = async () => {
@@ -144,21 +145,67 @@ export function Feed({ className }: FeedProps) {
   };
 
   const handleToggleLike = async (postId: string) => {
+    if (isLiking) return;
+    setIsLiking(true);
+    
     const token = Cookies.get("access_token");
-    if (!token) return alert("Usuário não autenticado");
-
+    if (!token) {
+      alert("Usuário não autenticado");
+      setIsLiking(false);
+      return;
+    }
+  
     const decoded: jwtPayload = jwtDecode(token);
     const userId = decoded.userId;
-
+    
     try {
-      const updatedPost = await toggleLike(postId, userId);
+      // Check if the user has already liked this post
+      const isLiked = posts.find(post => post._id === postId)?.likes
+        .filter(like => like !== null)
+        .some(like => {
+          if (typeof like.user === 'object') {
+            return like.user._id === userId;
+          }
+          return like.user === userId;
+        });
+      
+      let response;
+      
+      if (isLiked) {
+        // If already liked, unlike it
+        response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/like/post/unlike`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId, postId }),
+        });
+      } else {
+        // If not liked, like it
+        response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/like/post/${postId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
+        });
+      }
+  
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Erro ao processar a curtida");
+      }
+  
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post._id === postId ? { ...post, likes: updatedPost.likes } : post
+          post._id === postId ? { ...post, likes: data.likes } : post
         )
       );
     } catch (error) {
       console.error("Erro ao alternar like:", error);
+    } finally {
+      setIsLiking(false);
     }
   };
 
