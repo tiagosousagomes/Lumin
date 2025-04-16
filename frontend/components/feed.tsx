@@ -12,50 +12,47 @@ import { jwtDecode } from "jwt-decode";
 import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { toggleLike } from "../services/postService"; // Importa o serviço de likes
 
-interface Like {
-  _id: string;
-  user: User | string; // Pode ser o objeto completo ou apenas o ID
-  post: Post | string;
-  createdAt: Date;
-}
-interface Comments {
-  _id: string;
-  content: string;
-  author: User | string; // Pode ser o objeto completo ou apenas o ID
-  post: Post | string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 interface User {
   _id: string;
   name: string;
   username: string;
   email: string;
+  profilePicture?: string;
 }
+
+interface Comment {
+  _id: string;
+  content: string;
+  author: User | string;
+  post: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface Post {
   _id: string;
   content: string;
   author: User;
-  likes: Like[];
-  comments: Comments[];
-  image: {
+  likes: string[];
+  comments: Comment[];
+  image?: {
     data: Buffer;
     contentType: string;
   };
 }
 
-interface responsePost {
+interface ResponsePost {
   success: boolean;
   message?: string;
   data: Post[];
 }
+
 interface FeedProps {
   className?: string;
 }
 
-interface jwtPayload {
+interface JwtPayload {
   userId: string;
 }
 
@@ -65,12 +62,25 @@ export function Feed({ className }: FeedProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchResponse = async () => {
+    const token = Cookies.get("access_token");
+    if (token) {
+      try {
+        const decoded: JwtPayload = jwtDecode(token);
+        setCurrentUserId(decoded.userId);
+      } catch (error) {
+        console.error("Erro ao decodificar token:", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/post`);
-        const data: responsePost = await response.json();
+        const data: ResponsePost = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
           setPosts(data.data);
@@ -81,19 +91,18 @@ export function Feed({ className }: FeedProps) {
         console.error("Erro ao buscar posts:", err);
       }
     };
-    fetchResponse();
+    fetchPosts();
   }, []);
 
   const handleCreatePost = async () => {
-    const token = Cookies.get("access_token");
-    if (!token) return alert("Usuário não autenticado");
-
-    const decoded: jwtPayload = jwtDecode(token);
-    const userId = decoded.userId;
+    if (!currentUserId) {
+      alert("Usuário não autenticado");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("content", postContent);
-    formData.append("author", userId);
+    formData.append("author", currentUserId);
     if (imageFile) {
       formData.append("image", imageFile);
     }
@@ -145,55 +154,21 @@ export function Feed({ className }: FeedProps) {
   };
 
   const handleToggleLike = async (postId: string) => {
-    if (isLiking) return;
+    if (isLiking || !currentUserId) return;
     setIsLiking(true);
     
-    const token = Cookies.get("access_token");
-    if (!token) {
-      alert("Usuário não autenticado");
-      setIsLiking(false);
-      return;
-    }
-  
-    const decoded: jwtPayload = jwtDecode(token);
-    const userId = decoded.userId;
-    
     try {
-      // Check if the user has already liked this post
-      const isLiked = posts.find(post => post._id === postId)?.likes
-        .filter(like => like !== null)
-        .some(like => {
-          if (typeof like.user === 'object') {
-            return like.user._id === userId;
-          }
-          return like.user === userId;
-        });
-      
-      let response;
-      
-      if (isLiked) {
-        // If already liked, unlike it
-        response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/like/post/unlike`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId, postId }),
-        });
-      } else {
-        // If not liked, like it
-        response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/like/post/${postId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId }),
-        });
-      }
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/like/${postId}/toggle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: currentUserId }),
+      });
   
       const data = await response.json();
       
-      if (!response.ok) {
+      if (!data.success) {
         throw new Error(data.message || "Erro ao processar a curtida");
       }
   
@@ -203,10 +178,14 @@ export function Feed({ className }: FeedProps) {
         )
       );
     } catch (error) {
-      console.error("Erro ao alternar like:", error);
+      console.error("Erro ao alternar curtida:", error);
     } finally {
       setIsLiking(false);
     }
+  };
+
+  const hasUserLikedPost = (post: Post) => {
+    return currentUserId && post.likes.includes(currentUserId);
   };
 
   return (
@@ -246,24 +225,20 @@ export function Feed({ className }: FeedProps) {
             {imageFile && (
               <span className="text-xs text-white">{imageFile.name}</span>
             )}
-            <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
-              <SmilePlus />
-              <input
-                className="hidden"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              ></input>
-            </label>
             <div className="relative emoji-picker-container">
-              <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}></button>
+              <button 
+                className="emoji-button cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              >
+                <SmilePlus />
+              </button>
               {showEmojiPicker && (
                 <div className="absolute top-1 left-0 z-50">
-                  <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
-                    <EmojiPicker
-                      onEmojiClick={handleEmojiClick}
-                      height={400}
-                      width={500}
-                    />
-                  </label>
+                  <EmojiPicker
+                    onEmojiClick={handleEmojiClick}
+                    height={400}
+                    width={500}
+                  />
                 </div>
               )}
             </div>
@@ -285,6 +260,7 @@ export function Feed({ className }: FeedProps) {
             <CardHeader className="flex-row items-start gap-4 space-y-0 pb-2">
               <Avatar>
                 <AvatarImage
+                  src={post.author?.profilePicture}
                   alt={post.author?.username || "Usuário desconhecido"}
                 />
                 <AvatarFallback>
@@ -298,7 +274,7 @@ export function Feed({ className }: FeedProps) {
                       {post.author?.name || "Usuário desconhecido"}
                     </span>
                     <span className="text-sm text-gray-400">
-                      {post.author?.username || "@desconhecido"}
+                      {post.author?.username ? `@${post.author.username}` : "@desconhecido"}
                     </span>
                   </div>
                   <Button
@@ -329,26 +305,25 @@ export function Feed({ className }: FeedProps) {
               )}
             </CardContent>
             <CardFooter className="flex justify-between py-2">
-              {/* Botão de Like */}
               <Button
                 variant="muted"
                 size="sm"
                 className={`gap-1 ${
-                  post.likes.filter((like) => like !== null).some((like) => like?.user === Cookies.get("userId"))
+                  hasUserLikedPost(post)
                     ? "text-red-500"
                     : "text-gray-400"
                 } hover:text-red-500`}
                 onClick={() => handleToggleLike(post._id)}
+                disabled={isLiking}
               >
-                {post.likes.filter((like) => like !== null).some((like) => like?.user === Cookies.get("userId")) ? (
+                {hasUserLikedPost(post) ? (
                   <Heart className="h-4 w-4 fill-current" /> 
                 ) : (
                   <Heart className="h-4 w-4" /> 
                 )}
-                <span>{post.likes.filter((like) => like !== null).length}</span>
+                <span>{post.likes.length}</span>
               </Button>
 
-              {/* Botão de Comentários */}
               <Button
                 variant="muted"
                 size="sm"
@@ -358,7 +333,6 @@ export function Feed({ className }: FeedProps) {
                 <span>{post.comments.length}</span>
               </Button>
 
-              {/* Botão de Compartilhar */}
               <Button
                 variant="muted"
                 size="sm"
