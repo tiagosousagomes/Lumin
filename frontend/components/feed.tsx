@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, MessageCircle, MoreHorizontal, Share, SmilePlus } from "lucide-react";
+import { Bookmark, Heart, MessageCircle, MoreHorizontal, Share, SmilePlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ interface Post {
   author: User;
   likes: string[];
   comments: Comment[];
+  bookmarks?: string[]; // Adicionando o campo bookmarks
   image?: {
     data: Buffer;
     contentType: string;
@@ -62,7 +63,9 @@ export function Feed({ className }: FeedProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [isBookmarking, setIsBookmarking] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [postBookmarks, setPostBookmarks] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     const token = Cookies.get("access_token");
@@ -84,6 +87,10 @@ export function Feed({ className }: FeedProps) {
 
         if (data.success && Array.isArray(data.data)) {
           setPosts(data.data);
+          // Depois de buscar posts, verificar bookmarks se o usuário estiver logado
+          if (currentUserId) {
+            checkUserBookmarks(data.data);
+          }
         } else {
           console.error("Formato de dados inesperado:", data);
         }
@@ -92,7 +99,29 @@ export function Feed({ className }: FeedProps) {
       }
     };
     fetchPosts();
-  }, []);
+  }, [currentUserId]);
+
+  // Função para verificar quais posts o usuário já adicionou aos favoritos
+  const checkUserBookmarks = async (postsToCheck: Post[]) => {
+    if (!currentUserId) return;
+    
+    const bookmarkStatus: {[key: string]: boolean} = {};
+    
+    try {
+      // Verificar status de bookmark para cada post
+      for (const post of postsToCheck) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${post._id}/user/${currentUserId}/check`
+        );
+        const data = await response.json();
+        bookmarkStatus[post._id] = data.isBookmarked;
+      }
+      
+      setPostBookmarks(bookmarkStatus);
+    } catch (error) {
+      console.error("Erro ao verificar bookmarks:", error);
+    }
+  };
 
   const handleCreatePost = async () => {
     if (!currentUserId) {
@@ -184,8 +213,53 @@ export function Feed({ className }: FeedProps) {
     }
   };
 
+  // Nova função para alternar bookmark
+  const handleToggleBookmark = async (postId: string) => {
+    if (isBookmarking || !currentUserId) return;
+    setIsBookmarking(true);
+    
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${postId}/toggle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: currentUserId }),
+      });
+  
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || "Erro ao processar o bookmark");
+      }
+  
+      // Atualizar o estado local dos bookmarks
+      setPostBookmarks(prev => ({
+        ...prev,
+        [postId]: !prev[postId]
+      }));
+      
+      // Se a API retornar a lista atualizada de bookmarks, podemos atualizar o post
+      if (data.bookmarks) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId ? { ...post, bookmarks: data.bookmarks } : post
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao alternar bookmark:", error);
+    } finally {
+      setIsBookmarking(false);
+    }
+  };
+
   const hasUserLikedPost = (post: Post) => {
     return currentUserId && post.likes.includes(currentUserId);
+  };
+
+  const hasUserBookmarkedPost = (postId: string) => {
+    return postBookmarks[postId] || false;
   };
 
   return (
@@ -339,6 +413,25 @@ export function Feed({ className }: FeedProps) {
                 className="text-gray-400 hover:text-[#108CD9]"
               >
                 <Share className="h-4 w-4" />
+              </Button>
+
+              {/* Novo botão de bookmark */}
+              <Button
+                variant="muted"
+                size="sm"
+                className={`${
+                  hasUserBookmarkedPost(post._id)
+                    ? "text-[#4B7CCC]"
+                    : "text-gray-400"
+                } hover:text-[#4B7CCC]`}
+                onClick={() => handleToggleBookmark(post._id)}
+                disabled={isBookmarking}
+              >
+                {hasUserBookmarkedPost(post._id) ? (
+                  <Bookmark className="h-4 w-4 fill-current" />
+                ) : (
+                  <Bookmark className="h-4 w-4" />
+                )}
               </Button>
             </CardFooter>
           </Card>

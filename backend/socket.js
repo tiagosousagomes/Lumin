@@ -8,16 +8,15 @@ const initializeSocket = (server) => {
     io = new Server(server, {
         cors: {
             origin: `${process.env.URL_FRONT}`,
-            methods: ["GET", "POST"],
-            credentials: true  // Add this
+            methods: ["GET", "POST", "PUT", "DELETE"],
+            credentials: true 
         },
-        transports: ['websocket', 'polling']  // Explicitly set transports
+        transports: ['websocket', 'polling']
     });
 
     io.on("connection", (socket) => {
         logger.info("[User] User connected:", socket.id);
 
-        // Match event names with frontend
         socket.on("add_user", (userId) => {
             users[userId] = socket.id;
             io.emit("get_users", Object.keys(users));

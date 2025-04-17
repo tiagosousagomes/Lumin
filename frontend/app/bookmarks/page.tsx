@@ -48,6 +48,7 @@ export default function MarcacoesPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [isLiking, setIsLiking] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isTogglingBookmark, setIsTogglingBookmark] = useState(false)
 
   useEffect(() => {
     const token = Cookies.get("access_token")
@@ -62,30 +63,28 @@ export default function MarcacoesPage() {
   }, [])
 
   useEffect(() => {
-    const fetchBookmarkedPosts = async () => {
-      if (!currentUserId) return
-
-      setIsLoading(true)
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/user/${currentUserId}`)
-        const data = await response.json()
-
-        if (data.success && Array.isArray(data.data)) {
-          setBookmarkedPosts(data.data)
-        } else {
-          console.error("Formato de dados inesperado:", data)
-        }
-      } catch (err) {
-        console.error("Erro ao buscar marcações:", err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (currentUserId) {
-      fetchBookmarkedPosts()
-    }
+    fetchBookmarkedPosts()
   }, [currentUserId])
+
+  const fetchBookmarkedPosts = async () => {
+    if (!currentUserId) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${currentUserId}`)
+      const data = await response.json()
+
+      if (data.success && Array.isArray(data.data)) {
+        setBookmarkedPosts(data.data)
+      } else {
+        console.error("Formato de dados inesperado:", data)
+      }
+    } catch (err) {
+      console.error("Erro ao buscar marcações:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleToggleLike = async (postId: string) => {
     if (isLiking || !currentUserId) return
@@ -116,12 +115,13 @@ export default function MarcacoesPage() {
     }
   }
 
-  const handleRemoveBookmark = async (postId: string) => {
-    if (!currentUserId) return
+  const handleToggleBookmark = async (postId: string) => {
+    if (isTogglingBookmark || !currentUserId) return
+    setIsTogglingBookmark(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${postId}/remove`, {
-        method: "DELETE",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${postId}/toggle`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -131,13 +131,51 @@ export default function MarcacoesPage() {
       const data = await response.json()
 
       if (!data.success) {
-        throw new Error(data.message || "Erro ao remover marcação")
+        throw new Error(data.message || "Erro ao processar a marcação")
       }
 
-      // Remove o post da lista de marcados
-      setBookmarkedPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId))
+      if (data.action === "unbookmarked") {
+        setBookmarkedPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId))
+      }
+
     } catch (error) {
-      console.error("Erro ao remover marcação:", error)
+      console.error("Erro ao alternar marcação:", error)
+    } finally {
+      setIsTogglingBookmark(false)
+    }
+  }
+
+  const checkIfPostIsBookmarked = async (postId: string) => {
+    if (!currentUserId) return false
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${postId}/user/${currentUserId}/check`
+      )
+      const data = await response.json()
+
+      if (data.success) {
+        return data.isBookmarked
+      }
+      return false
+    } catch (error) {
+      console.error("Erro ao verificar status da marcação:", error)
+      return false
+    }
+  }
+
+  const getBookmarkCount = async (postId: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${postId}/count`)
+      const data = await response.json()
+
+      if (data.success) {
+        return data.count
+      }
+      return 0
+    } catch (error) {
+      console.error("Erro ao obter contagem de marcações:", error)
+      return 0
     }
   }
 
@@ -186,7 +224,8 @@ export default function MarcacoesPage() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#4B7CCC]"
-                        onClick={() => handleRemoveBookmark(post._id)}
+                        onClick={() => handleToggleBookmark(post._id)}
+                        disabled={isTogglingBookmark}
                       >
                         <Bookmark className="h-4 w-4 fill-current" />
                         <span className="sr-only">Remover marcação</span>
