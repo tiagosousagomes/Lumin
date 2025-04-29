@@ -1,5 +1,5 @@
-const Message = require("../models/messages");
-const User = require("../models/user");
+const Message = require("../models/message/messageModel");
+const User = require("../models/user/userModel");
 const crypto = require("crypto");
 require("dotenv").config();
 const aiService = require("../Services/aiService");

@@ -1,5 +1,5 @@
-const Post = require("../models/post");
-const User = require("../models/user");
+const Post = require("../models/post/postModel");
+const User = require("../models/user/userModel");
 const multer = require("multer");
 
 // Configuração do multer para armazenar a imagem na memória

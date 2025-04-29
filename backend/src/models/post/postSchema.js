@@ -47,6 +47,6 @@ postSchema.methods.toggleLike = async function (userId) {
     return this;
 };
 
-module.exports = mongoose.model("post", postSchema);
+module.exports = postSchema
 
 

@@ -1,6 +1,6 @@
-const Post = require("../models/post");
-const User = require("../models/user");
-const Bookmark = require("../models/bookmark");
+const Post = require("../models/post/postModel");
+const User = require("../models/user/userModel");
+const Bookmark = require("../models/bookmark/bookmarkModel");
 
 const toggleBookmark = async (req, res) => {
     try {

@@ -1,6 +1,6 @@
 const { Server } = require('socket.io');
 const logger = require('./src/utils/utils');
-const Message = require('./src/models/messages');
+const Message = require('./src/models/message/messageSchema');
 const crypto = require('crypto');
 require('dotenv').config();
 

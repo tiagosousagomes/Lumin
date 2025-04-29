@@ -1,4 +1,6 @@
 let mongoose = require("mongoose");
+let emailValidator = require("./validators/userEmailValidator")
+let usernameValidator = require("./validators/userUsernameValidator")
 
 let userSchema = new mongoose.Schema({
 	name: {
@@ -14,12 +16,7 @@ let userSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "username é obrigatorio"],
 		unique: true,
-		validate: {
-			validator: function(v) {
-				return /^[a-zA-Z0-9_]+$/.test(v); // Apenas letras, números e underscores
-			},
-			message: (props) => `${props.value} não é um nome de usuário válido!`,
-		},
+		validate: usernameValidator
 	},
 	avatar: {
 		data: Buffer,
@@ -33,12 +30,7 @@ let userSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 		unique: true,
-		validate: {
-			validator: function(v) {
-				return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); // Validação de e-mail
-			},
-			message: (props) => `${props.value} não é um e-mail válido!`,
-		},
+		validate: emailValidator
 	},
 	follower: [{
 		type: mongoose.Schema.Types.ObjectId,
@@ -61,4 +53,4 @@ let userSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = userSchema

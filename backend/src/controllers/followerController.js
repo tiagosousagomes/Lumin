@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const Follower = require("../models/followers");
-const User = require("../models/user");
+const Follower = require("../models/follow/followModel");
+const User = require("../models/user/userModel");
 const logger = require("../utils/utils");
 
 const followUser = async (req, res) => {
