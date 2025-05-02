@@ -6,11 +6,13 @@ const cors = require("cors");
 const { initializeSocket } = require('./socket');
 const userRoutes = require('./src/routes/userRoute');
 const postRoutes = require('./src/routes/postRoute');
-const likeRoutes = require('./src/routes/likeRoute');
+const likeRoutes = require('./src/routes/likeroute');
 const commentRoutes = require('./src/routes/commentRoute');
 const messagesRoutes = require('./src/routes/messageRoute');
 const followerRoutes = require('./src/routes/followerRoute');
+const bookmarkRoutes = require('./src/routes/bookmarkRoute')
 const { swaggerUi, specs } = require("./swagger");
+const logger = require('./src/utils/utils')
 
 dotenv.config();
 
@@ -19,14 +21,14 @@ const server = http.createServer(app);
 
 app.use(express.json());
 app.use(cors({
-    origin: "http://localhost:3000", 
-    methods: ["GET", "POST"],
+    origin: `${process.env.URL_FRONT}`, 
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
-        console.log('✅ Banco de dados conectado com sucesso!');
+       logger.db('Banco conectado com sucesso')
 
         app.use('/api', userRoutes);
         app.use('/api', postRoutes);
@@ -34,16 +36,17 @@ mongoose.connect(process.env.MONGODB_URI)
         app.use('/api', commentRoutes);
         app.use('/api', followerRoutes);
         app.use('/api', messagesRoutes);
+        app.use('/api', bookmarkRoutes);
         app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
         initializeSocket(server);
 
-        const PORT = process.env.PORT || 3001;
+        const PORT = process.env.PORT_CONNECT_SERVER;
         server.listen(PORT, () => {
-            console.log(`🚀 Servidor rodando na porta ${PORT}`);
+            logger.routes(`Servidor rodando na porta ${PORT}`);
         });
     })
     .catch(err => {
-        console.error('❌ Falha ao conectar com o banco de dados', err.message);
+        logger.error('Falha ao conectar com o banco de dados', err.message);''
         process.exit(1);
     });

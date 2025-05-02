@@ -22,10 +22,12 @@
     "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-label": "^2.1.2",
     "bcrypt": "^5.1.1",
+    "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "fs-extra": "^11.3.0",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.14.0",
@@ -35,6 +37,5 @@
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
-  },
-  "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247"
+  }
 }
