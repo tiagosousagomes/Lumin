@@ -5,7 +5,7 @@ let usernameValidator = require("./validators/userUsernameValidator")
 let userSchema = new mongoose.Schema({
 	name: {
 		type: String,
-		required: [true, "o nome é obrigatório"]
+		required: [true, "o nome é obrigatório"],
 	},
 	password: {
 		type: String,

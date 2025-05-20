@@ -11,7 +11,7 @@ const userRepository = {
     },
 
     findById: async(id) => {
-        return await User.findOne(id)
+        return await User.findById(id)
     },
 
     findByEmail: async(email) => {
