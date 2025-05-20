@@ -10,9 +10,10 @@ const likeRoutes = require('./src/routes/likeroute');
 const commentRoutes = require('./src/routes/commentRoute');
 const messagesRoutes = require('./src/routes/messageRoute');
 const followerRoutes = require('./src/routes/followerRoute');
-const bookmarkRoutes = require('./src/routes/bookmarkRoute')
+const bookmarkRoutes = require('./src/routes/bookmarkRoute');
 const { swaggerUi, specs } = require("./swagger");
-const logger = require('./src/utils/utils')
+const logger = require('./src/utils/utils');
+const errorHandler = require('./src/middlewares/errorHandler');
 
 dotenv.config();
 
@@ -39,6 +40,8 @@ mongoose.connect(process.env.MONGODB_URI)
         app.use('/api', bookmarkRoutes);
         app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
+        app.use(errorHandler);
+        
         initializeSocket(server);
 
         const PORT = process.env.PORT_CONNECT_SERVER;
