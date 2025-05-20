@@ -1,6 +1,11 @@
 const userRepository = require("../repositories/userRepository")
-const bcrypt = require("bcrypt");
 const multer = require("multer")
+
+const createUserUC = require("../usecases/user/createUser");
+const getAllUsersUC = require("../usecases/user/getAllUsers");
+const getUserByIdUC = require("../usecases/user/getUserById");
+const updateUserUC = require("../usecases/user/updateUser");
+const deleteUserUC = require("../usecases/user/deleteUser");
 
 const upload = multer ({
   storage: multer.memoryStorage(),
@@ -15,56 +20,31 @@ const uploadImages = upload.fields([
 ]);
 
 const createUser = async (req, res, next) => {
-  try {
+  try{
     const { name, username, email, password } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Email já em uso",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const avatarFile = req.files?.avatar?.[0];
     const headerImageFile = req.files?.headerImage?.[0];
 
-    const user = new User({
-      name,
-      username,
-      email,
-      password: hashedPassword,
-      avatar: avatarFile
-        ? {
-            data: avatarFile.buffer,
-            contentType: avatarFile.mimetype,
-          }
-        : undefined,
-      headerImage: headerImageFile
-        ? {
-            data: headerImageFile.buffer,
-            contentType: headerImageFile.mimetype,
-          }
-        : undefined,
-    });
-
-    await user.save();
+    const user = await createUserUC(
+      { name, username, email, password, avatarFile, headerImageFile }, userRepository
+    );
 
     res.status(201).json({
       success: true,
       message: "Usuário criado com sucesso",
       data: user,
     });
-  } catch (err) {
-    next(err);
+  }catch (err){
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
 const getAllUser = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const users = await getAllUsersUC(userRepository);
     res.status(200).json({
       success: true,
       message: "Lista de usuarios:",
@@ -77,29 +57,24 @@ const getAllUser = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const userID = req.params.id;
-    const users = await User.findById(userID);
-    
-    if (!users) {
-     return res.status(404).json({
-        success: false,
-        message: "Usuario não encontrado",
-      });
-    }
+    const user = await getUserByIdUC(req.params.id, userRepository);
+
     res.status(200).json({
       success: true,
-      message: "Usuario correspondente ao ID:",
-      data: users,
+      message: "Usuário correspondente ao ID:",
+      data: user, 
     });
   } catch (err) {
-    next(err);
+    res.status(404).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
 const updateUser = async (req, res, next) => {
   try {
     const { name, username, bio, email, location } = req.body;
-
     const avatarFile = req.files?.avatar?.[0];
     const headerImageFile = req.files?.headerImage?.[0];
 
@@ -109,60 +84,37 @@ const updateUser = async (req, res, next) => {
       bio,
       email,
       location,
+      avatar: avatarFile ? { data: avatarFile.buffer, contentType: avatarFile.mimetype} : undefined,
+      headerImage: headerImageFile ? { data: headerImageFile.buffer, contentType: headerImageFile.mimetype} : undefined,
     };
-
-    if (avatarFile) {
-      updateData.avatar = {
-        data: avatarFile.buffer,
-        contentType: avatarFile.mimetype,
-      };
-    }
-
-    if (headerImageFile) {
-      updateData.headerImage = {
-        data: headerImageFile.buffer,
-        contentType: headerImageFile.mimetype,
-      };
-    }
-
-    const user = await User.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "Usuário não encontrado",
-      });
-    }
+    const user = await updateUserUC(req.params.id, updateData, userRepository);
 
     res.status(200).json({
       success: true,
       message: "Usuário atualizado com sucesso!",
       data: user,
     });
-  } catch (err) {
-    next(err);
+    } catch (err) {
+      res.status(404).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
 const deleteUser = async (req, res, next) => {
-  try {
-    const users = await User.findByIdAndDelete(req.params.id);
-    if (!users) {
-      res.status(400).json({
-        success: false,
-        message: "Usuario não encontrado!",
-      });
-    }
+  try { 
+    await deleteUserUC(req.params.id, userRepository);
 
     res.status(200).json({
       success: true,
-      message: "Usuario excluido com sucesso!",
+      message: "Usuário excluído com sucesso!"
     });
   } catch (err) {
-    next(err);
+    res.status(404).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
