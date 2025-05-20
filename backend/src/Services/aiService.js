@@ -1,16 +1,14 @@
-import {
-    GoogleGenerativeAI
-} from "@google/generative-ai";
-import dotenv from 'dotenv';
-dotenv.config()
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const dotenv = require('dotenv');
+dotenv.config();
 
-const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAi = new GoogleGenerativeAI(process.env.GEMINI_API_KEYY);
 const model = genAi.getGenerativeModel({
-    model: "gemini-2.0-flash-thinking-exp-01-21"
+    model: "gemini-2.0-flash"
 });
 
 const aiService = {
-    prompt: (question) => {
+    prompt: async (question) => {
         const p = {
             "contents": [{
                 "parts": [{
@@ -18,18 +16,21 @@ const aiService = {
                 }]
             }]
         }
-
-        const result = model.generateContent(p, {
-            timeout: 60000
-        })
-        return result.response;
+        
+        try {
+            const result = await model.generateContent(p, {
+                timeout: 60000
+            });
+            
+            const responseText = result.response.text();
+            return responseText;
+        } catch (error) {
+            console.error("Erro ao gerar conteúdo:", error);
+            throw error;
+        }
     },
-    analysePrompt: () => {
-
-    },
-    sinthetizePrompt: () => {
-
-    }
+    analysePrompt: () => {},
+    sinthetizePrompt: () => {}
 };
 
-export default aiService
+module.exports = aiService;

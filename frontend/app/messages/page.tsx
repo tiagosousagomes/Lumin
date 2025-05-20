@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TopNavigation } from "@/components/top-navigation"
+import ReactMarkdown from "react-markdown"
 
 interface Contact {
   id: string;
@@ -48,6 +49,16 @@ interface FollowingResponse {
     following: User;
   }>;
 }
+interface ApiMessageResponse {
+  success: boolean;
+  message: string;
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  createdAt: string;
+
+}
 
 export default function MessagesPage() {
   const [selectedChat, setSelectedChat] = useState<string | null>(null)
@@ -79,7 +90,7 @@ export default function MessagesPage() {
       
       try {
         setLoading(true)
-        const response = await fetch(`http://localhost:3001/api/following/${userId}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/following/${userId}`)
         
         if (!response.ok) {
           throw new Error('Error fetching contacts')
@@ -98,7 +109,17 @@ export default function MessagesPage() {
             unread: false
           }))
           
-          setContacts(formattedContacts)
+          const geminiContact: Contact = {
+            id: "gemini-ai",
+            name: "Gemini AI",
+            username: "gemini",
+            avatar: "/gemini-avatar.png", // Pode colocar um ícone ou imagem
+            lastMessage: "",
+            time: "",
+            unread: false
+          }
+          
+          setContacts([geminiContact, ...formattedContacts])
         }
       } catch (error) {
         console.error('Error fetching contacts:', error)
@@ -116,7 +137,7 @@ export default function MessagesPage() {
       
       try {
         setLoading(true)
-        const response = await fetch(`http://localhost:3001/api/messages/${userId}/${selectedChat}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/messages/${userId}/${selectedChat}`)
         
         if (!response.ok) {
           throw new Error('Error fetching messages')
@@ -125,7 +146,7 @@ export default function MessagesPage() {
         const data = await response.json()
         
         if (data.success && data.messages) {
-          const formattedMessages = data.messages.map((msg: any) => ({
+          const formattedMessages = data.messages.map((msg:ApiMessageResponse ) => ({
             id: msg._id,
             senderId: msg.senderId === userId ? "me" : msg.senderId,
             receiverId: msg.receiverId,
@@ -147,29 +168,23 @@ export default function MessagesPage() {
     }
   }, [selectedChat, userId])
 
-  // WebSocket setup
   useEffect(() => {
     if (!socket || !userId) return
 
-    // Add current user to online users list
     socket.emit('add_user', userId)
 
-    // Listen for online users
     socket.on('get_users', (users: string[]) => {
       setOnlineUsers(users)
     })
 
-    // Listen for incoming messages
     socket.on('receive_message', (data: Message) => {
-      // If message is from the currently selected chat
       if (selectedChat && data.senderId === selectedChat) {
         setMessages(prev => [...prev, {
           ...data,
-          senderId: selectedChat, // Keep the id for proper identification
+          senderId: selectedChat,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }])
       } 
-      // If message is from another chat, update that contact's last message
       else {
         setContacts(prev => 
           prev.map(contact =>
@@ -183,11 +198,6 @@ export default function MessagesPage() {
               : contact
           )
         )
-        
-        // Optional: Show notification for new message
-        if (data.senderId !== selectedChat) {
-          const sender = contacts.find(c => c.id === data.senderId)
-        }
       }
     })
 
@@ -205,11 +215,11 @@ export default function MessagesPage() {
     return Date.now().toString() + Math.random().toString(36).substr(2, 5)
   }
 
-  const handleSendMessage = useCallback(() => {
-    if (messageText.trim() && selectedChat && socket && userId && isConnected) {
+  const handleSendMessage = useCallback(async () => {
+    if (messageText.trim() && selectedChat && userId && isConnected) {
       const messageId = generateMessageId()
       const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      
+  
       const messageData = {
         id: messageId,
         senderId: userId,
@@ -217,14 +227,52 @@ export default function MessagesPage() {
         text: messageText,
         time: timestamp
       }
-      
-      socket.emit('send_message', messageData)
-
+  
+      if (selectedChat === "gemini-ai") {
+        setMessages(prev => [...prev, {
+          ...messageData,
+          senderId: "me",
+        }])
+  
+        setMessageText("")
+  
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/ai`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: messageText })
+          })
+  
+          const data = await response.json()
+          if (data.success) {
+            const aiMessage = {
+              id: generateMessageId(),
+              senderId: "gemini-ai",
+              receiverId: userId,
+              text: data.response,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+  
+            setMessages(prev => [...prev, aiMessage])
+          } else {
+            console.error("Erro da IA:", data.message)
+          }
+        } catch (error) {
+          console.error("Erro ao buscar resposta da IA:", error)
+        }
+  
+        return
+      }
+  
+      if (socket) {
+        socket.emit('send_message', messageData)
+      }
+  
       setMessages(prev => [...prev, {
         ...messageData,
         senderId: "me",
       }])
-
+  
       setContacts(prev => 
         prev.map(contact =>
           contact.id === selectedChat 
@@ -232,12 +280,13 @@ export default function MessagesPage() {
             : contact
         )
       )
-
+  
       setMessageText("")
     } else if (!isConnected) {
-     return
+      return
     }
   }, [messageText, selectedChat, socket, userId, isConnected])
+  
 
   const selectedContact = contacts.find((contact) => contact.id === selectedChat)
 
@@ -339,7 +388,9 @@ export default function MessagesPage() {
                             message.senderId === "me" ? "bg-[#4B7CCC] text-black" : "bg-[#2a2b2d] text-white"
                           }`}
                         >
-                          <p>{message.text}</p>
+                         <ReactMarkdown>
+                            {message.text}
+                        </ReactMarkdown>
                           <p className="mt-1 text-right text-xs opacity-70">{message.time}</p>
                         </div>
                       </div>
@@ -377,7 +428,7 @@ export default function MessagesPage() {
                 </div>
                 {!isConnected && (
                   <p className="mt-2 text-center text-xs text-red-400">
-                    You're currently offline. Messages can't be sent until connection is restored.
+                    You are currently offline. Messages will be sent when you reconnect.
                   </p>
                 )}
               </div>

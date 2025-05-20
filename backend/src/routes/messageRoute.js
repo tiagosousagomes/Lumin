@@ -10,4 +10,6 @@ router.patch("/message/", authMiddleware, messageController.markMessageAsRead);
 router.post("/message/", authMiddleware, messageController.sendMessage);
 router.delete("/message/:id", authMiddleware, messageController.deleteMessage);
 
+router.post("/ai", messageController.promptWithGemini);
+
 module.exports = router;

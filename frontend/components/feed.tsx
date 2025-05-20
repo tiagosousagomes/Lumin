@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, MessageCircle, MoreHorizontal, Share, SmilePlus } from "lucide-react";
+import { Bookmark, Heart, MessageCircle, MoreHorizontal, Share, SmilePlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,50 +12,48 @@ import { jwtDecode } from "jwt-decode";
 import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { toggleLike } from "../services/postService"; // Importa o serviço de likes
 
-interface Like {
-  _id: string;
-  user: User | string; // Pode ser o objeto completo ou apenas o ID
-  post: Post | string;
-  createdAt: Date;
-}
-interface Comments {
-  _id: string;
-  content: string;
-  author: User | string; // Pode ser o objeto completo ou apenas o ID
-  post: Post | string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 interface User {
   _id: string;
   name: string;
   username: string;
   email: string;
+  profilePicture?: string;
 }
+
+interface Comment {
+  _id: string;
+  content: string;
+  author: User | string;
+  post: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface Post {
   _id: string;
   content: string;
   author: User;
-  likes: Like[];
-  comments: Comments[];
-  image: {
+  likes: string[];
+  comments: Comment[];
+  bookmarks?: string[]; // Adicionando o campo bookmarks
+  image?: {
     data: Buffer;
     contentType: string;
   };
 }
 
-interface responsePost {
+interface ResponsePost {
   success: boolean;
   message?: string;
   data: Post[];
 }
+
 interface FeedProps {
   className?: string;
 }
 
-interface jwtPayload {
+interface JwtPayload {
   userId: string;
 }
 
@@ -64,15 +62,35 @@ export function Feed({ className }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+  const [isBookmarking, setIsBookmarking] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [postBookmarks, setPostBookmarks] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
-    const fetchResponse = async () => {
+    const token = Cookies.get("access_token");
+    if (token) {
       try {
-        const response = await fetch("http://localhost:3001/api/post");
-        const data: responsePost = await response.json();
+        const decoded: JwtPayload = jwtDecode(token);
+        setCurrentUserId(decoded.userId);
+      } catch (error) {
+        console.error("Erro ao decodificar token:", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/post`);
+        const data: ResponsePost = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
           setPosts(data.data);
+          // Depois de buscar posts, verificar bookmarks se o usuário estiver logado
+          if (currentUserId) {
+            checkUserBookmarks(data.data);
+          }
         } else {
           console.error("Formato de dados inesperado:", data);
         }
@@ -80,25 +98,46 @@ export function Feed({ className }: FeedProps) {
         console.error("Erro ao buscar posts:", err);
       }
     };
-    fetchResponse();
-  }, []);
+    fetchPosts();
+  }, [currentUserId]);
+
+  // Função para verificar quais posts o usuário já adicionou aos favoritos
+  const checkUserBookmarks = async (postsToCheck: Post[]) => {
+    if (!currentUserId) return;
+    
+    const bookmarkStatus: {[key: string]: boolean} = {};
+    
+    try {
+      // Verificar status de bookmark para cada post
+      for (const post of postsToCheck) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${post._id}/user/${currentUserId}/check`
+        );
+        const data = await response.json();
+        bookmarkStatus[post._id] = data.isBookmarked;
+      }
+      
+      setPostBookmarks(bookmarkStatus);
+    } catch (error) {
+      console.error("Erro ao verificar bookmarks:", error);
+    }
+  };
 
   const handleCreatePost = async () => {
-    const token = Cookies.get("access_token");
-    if (!token) return alert("Usuário não autenticado");
-
-    const decoded: jwtPayload = jwtDecode(token);
-    const userId = decoded.userId;
+    if (!currentUserId) {
+      alert("Usuário não autenticado");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("content", postContent);
-    formData.append("author", userId);
+    formData.append("author", currentUserId);
     if (imageFile) {
       formData.append("image", imageFile);
     }
 
     try {
-      const response = await fetch("http://localhost:3001/api/post", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/post`, {
         method: "POST",
         body: formData,
       });
@@ -144,22 +183,83 @@ export function Feed({ className }: FeedProps) {
   };
 
   const handleToggleLike = async (postId: string) => {
-    const token = Cookies.get("access_token");
-    if (!token) return alert("Usuário não autenticado");
-
-    const decoded: jwtPayload = jwtDecode(token);
-    const userId = decoded.userId;
-
+    if (isLiking || !currentUserId) return;
+    setIsLiking(true);
+    
     try {
-      const updatedPost = await toggleLike(postId, userId);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/like/${postId}/toggle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: currentUserId }),
+      });
+  
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || "Erro ao processar a curtida");
+      }
+  
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post._id === postId ? { ...post, likes: updatedPost.likes } : post
+          post._id === postId ? { ...post, likes: data.likes } : post
         )
       );
     } catch (error) {
-      console.error("Erro ao alternar like:", error);
+      console.error("Erro ao alternar curtida:", error);
+    } finally {
+      setIsLiking(false);
     }
+  };
+
+  // Nova função para alternar bookmark
+  const handleToggleBookmark = async (postId: string) => {
+    if (isBookmarking || !currentUserId) return;
+    setIsBookmarking(true);
+    
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/bookmark/${postId}/toggle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: currentUserId }),
+      });
+  
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || "Erro ao processar o bookmark");
+      }
+  
+      // Atualizar o estado local dos bookmarks
+      setPostBookmarks(prev => ({
+        ...prev,
+        [postId]: !prev[postId]
+      }));
+      
+      // Se a API retornar a lista atualizada de bookmarks, podemos atualizar o post
+      if (data.bookmarks) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId ? { ...post, bookmarks: data.bookmarks } : post
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao alternar bookmark:", error);
+    } finally {
+      setIsBookmarking(false);
+    }
+  };
+
+  const hasUserLikedPost = (post: Post) => {
+    return currentUserId && post.likes.includes(currentUserId);
+  };
+
+  const hasUserBookmarkedPost = (postId: string) => {
+    return postBookmarks[postId] || false;
   };
 
   return (
@@ -199,24 +299,20 @@ export function Feed({ className }: FeedProps) {
             {imageFile && (
               <span className="text-xs text-white">{imageFile.name}</span>
             )}
-            <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
-              <SmilePlus />
-              <input
-                className="hidden"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              ></input>
-            </label>
             <div className="relative emoji-picker-container">
-              <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}></button>
+              <button 
+                className="emoji-button cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              >
+                <SmilePlus />
+              </button>
               {showEmojiPicker && (
                 <div className="absolute top-1 left-0 z-50">
-                  <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
-                    <EmojiPicker
-                      onEmojiClick={handleEmojiClick}
-                      height={400}
-                      width={500}
-                    />
-                  </label>
+                  <EmojiPicker
+                    onEmojiClick={handleEmojiClick}
+                    height={400}
+                    width={500}
+                  />
                 </div>
               )}
             </div>
@@ -238,6 +334,7 @@ export function Feed({ className }: FeedProps) {
             <CardHeader className="flex-row items-start gap-4 space-y-0 pb-2">
               <Avatar>
                 <AvatarImage
+                  src={post.author?.profilePicture}
                   alt={post.author?.username || "Usuário desconhecido"}
                 />
                 <AvatarFallback>
@@ -251,7 +348,7 @@ export function Feed({ className }: FeedProps) {
                       {post.author?.name || "Usuário desconhecido"}
                     </span>
                     <span className="text-sm text-gray-400">
-                      {post.author?.username || "@desconhecido"}
+                      {post.author?.username ? `@${post.author.username}` : "@desconhecido"}
                     </span>
                   </div>
                   <Button
@@ -282,26 +379,25 @@ export function Feed({ className }: FeedProps) {
               )}
             </CardContent>
             <CardFooter className="flex justify-between py-2">
-              {/* Botão de Like */}
               <Button
                 variant="muted"
                 size="sm"
                 className={`gap-1 ${
-                  post.likes.filter((like) => like !== null).some((like) => like?.user === Cookies.get("userId"))
+                  hasUserLikedPost(post)
                     ? "text-red-500"
                     : "text-gray-400"
                 } hover:text-red-500`}
                 onClick={() => handleToggleLike(post._id)}
+                disabled={isLiking}
               >
-                {post.likes.filter((like) => like !== null).some((like) => like?.user === Cookies.get("userId")) ? (
+                {hasUserLikedPost(post) ? (
                   <Heart className="h-4 w-4 fill-current" /> 
                 ) : (
                   <Heart className="h-4 w-4" /> 
                 )}
-                <span>{post.likes.filter((like) => like !== null).length}</span>
+                <span>{post.likes.length}</span>
               </Button>
 
-              {/* Botão de Comentários */}
               <Button
                 variant="muted"
                 size="sm"
@@ -311,13 +407,31 @@ export function Feed({ className }: FeedProps) {
                 <span>{post.comments.length}</span>
               </Button>
 
-              {/* Botão de Compartilhar */}
               <Button
                 variant="muted"
                 size="sm"
                 className="text-gray-400 hover:text-[#108CD9]"
               >
                 <Share className="h-4 w-4" />
+              </Button>
+
+              {/* Novo botão de bookmark */}
+              <Button
+                variant="muted"
+                size="sm"
+                className={`${
+                  hasUserBookmarkedPost(post._id)
+                    ? "text-[#4B7CCC]"
+                    : "text-gray-400"
+                } hover:text-[#4B7CCC]`}
+                onClick={() => handleToggleBookmark(post._id)}
+                disabled={isBookmarking}
+              >
+                {hasUserBookmarkedPost(post._id) ? (
+                  <Bookmark className="h-4 w-4 fill-current" />
+                ) : (
+                  <Bookmark className="h-4 w-4" />
+                )}
               </Button>
             </CardFooter>
           </Card>

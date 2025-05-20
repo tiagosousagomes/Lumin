@@ -1,27 +1,28 @@
-const Message = require("../models/messages");
-const User = require("../models/user");
+const Message = require("../models/message/messageModel");
+const User = require("../models/user/userModel");
 const crypto = require("crypto");
-require("dotenv").config()
-// SISTEMA PARA CRIPTOGRAFIA DE MENSAGENS
+require("dotenv").config();
+const aiService = require("../Services/aiService");
 
+// SISTEMA PARA CRIPTOGRAFIA DE MENSAGENS
 const SECRET_KEY = process.env.SECRET_KEY
-const ALGORITHM = "aes-256-cbc"; // utilizei o algoritimo que já crip, e descrip
+const ALGORITHM = "aes-256-cbc";
 
 const encryptMessage = (message) => {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(SECRET_KEY), iv);
   let encrypted = cipher.update(message, "utf8", "hex");
   encrypted += cipher.final("hex");
-  return { encryptMessage: encrypted, iv: iv.toString("hex") };
+  return { encryptedMessage: encrypted, iv: iv.toString("hex") };
 };
 
-const decryptMessage = (encryptMessage, iv) => {
+const decryptMessage = (encryptedContent, iv) => {
   const decipher = crypto.createDecipheriv(
     ALGORITHM,
     Buffer.from(SECRET_KEY),
     Buffer.from(iv, "hex")
   );
-  let decrypted = decipher.update(encryptMessage, "hex", "utf8");
+  let decrypted = decipher.update(encryptedContent, "hex", "utf8");
   decrypted += decipher.final("utf-8");
   return decrypted;
 };
@@ -35,7 +36,7 @@ const sendMessage = async (req, res) => {
 
     if (!sender || !receiver) {
       return res.status(404).json({
-        sucess: false,
+        success: false,
         message: "Usuário não encontrado",
       });
     }
@@ -52,16 +53,16 @@ const sendMessage = async (req, res) => {
     await message.save();
 
     res.status(201).json({
-      sucess: true,
+      success: true,
       message: "Mensagem enviada com sucesso",
       data: message,
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Erro interno", error: err.message });
-}
+  }
 };
 
-const markMessageAsRead = async (req, res, next) => {
+const markMessageAsRead = async (req, res) => {
   try {
     const { messageID } = req.body;
 
@@ -69,7 +70,7 @@ const markMessageAsRead = async (req, res, next) => {
 
     if (!message) {
       return res.status(404).json({
-        sucess: false,
+        success: false,
         message: "Mensagem não encontrada",
       });
     }
@@ -79,13 +80,13 @@ const markMessageAsRead = async (req, res, next) => {
     await message.save();
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "Mensagem marcada como lida",
       data: message,
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Erro interno", error: err.message });
-}
+  }
 };
 
 const getMessages = async (req, res) => {
@@ -97,7 +98,7 @@ const getMessages = async (req, res) => {
         { sender: userID1, receiver: userID2 },
         { sender: userID2, receiver: userID1 },
       ],
-    }).sort({ creatAt: 1 });
+    }).sort({ createdAt: 1 });
 
     const decryptedMessages = messages.map((message) => {
       const decryptedContent = decryptMessage(message.content, message.iv);
@@ -105,13 +106,13 @@ const getMessages = async (req, res) => {
     });
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "Mensagens recuperadas com sucesso",
       data: decryptedMessages,
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Erro interno", error: err.message });
-}
+  }
 };
 
 const deleteMessage = async (req, res) => {
@@ -122,7 +123,7 @@ const deleteMessage = async (req, res) => {
 
     if (!message) {
       return res.status(404).json({
-        sucess: false,
+        success: false,
         message: "Mensagem não encontrada",
       });
     }
@@ -131,24 +132,21 @@ const deleteMessage = async (req, res) => {
       message.sender.toString() !== userID &&
       message.receiver.toString() !== userID
     ) {
-      return (
-        res.status(403),
-        json({
-          sucess: false,
-          message: "Você não tem permissão para excluir essa mensagem",
-        })
-      );
+      return res.status(403).json({
+        success: false,
+        message: "Você não tem permissão para excluir essa mensagem",
+      });
     }
 
-    await message.remove();
+    await Message.deleteOne({ _id: messageID });
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "Mensagem excluída com sucesso",
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Erro interno", error: err.message });
-}
+  }
 };
 
 const getMessagesBetweenUsers = async (req, res) => {
@@ -157,21 +155,56 @@ const getMessagesBetweenUsers = async (req, res) => {
     
     const messages = await Message.find({
       $or: [
-        { senderId: userId, receiverId: receiverId },
-        { senderId: receiverId, receiverId: userId }
+        { sender: userId, receiver: receiverId },
+        { sender: receiverId, receiver: userId }
       ]
     }).sort({ createdAt: 1 });
     
+    const decryptedMessages = messages.map(message => {
+      const decryptedContent = decryptMessage(message.content, message.iv);
+      return {
+        id: message._id,
+        senderId: message.sender,
+        receiverId: message.receiver,
+        text: decryptedContent,
+        read: message.read,
+        time: message.createdAt
+      };
+    });
+    
     return res.status(200).json({
       success: true,
-      messages: messages
+      messages: decryptedMessages
     });
   } catch (error) {
-    console.error('Error fetching messages between users:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch messages',
       error: error.message
+    });
+  }
+};
+
+const promptWithGemini = async (req, res) => {
+  const { question } = req.body;
+
+  if (!question) {
+    return res.status(400).json({ success: false, message: "Pergunta não fornecida" });
+  }
+  
+  try {
+    const response = await aiService.prompt(question);
+  
+    res.status(200).json({
+      success: true,
+      message: "AI response generated",
+      response,
+    });
+  } catch (error) {
+    console.error("AI error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error generating response",
     });
   }
 };
@@ -181,5 +214,6 @@ module.exports = {
   markMessageAsRead,
   getMessages,
   deleteMessage,
-  getMessagesBetweenUsers
+  getMessagesBetweenUsers,
+  promptWithGemini,
 };

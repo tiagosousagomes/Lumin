@@ -15,4 +15,4 @@ let followSchema = new mongoose.Schema({
 	timestamps:true
 });
 
-module.exports = mongoose.model("follow", followSchema);
+module.exports = followSchema

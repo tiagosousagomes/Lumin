@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
+
 interface User {
   _id: string
   name: string
@@ -42,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return
         }
 
-        const response = await fetch('http://localhost:3001/api/auth/me', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -96,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
   }) => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVER}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
