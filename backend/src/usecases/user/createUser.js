@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const userRepository = require("../../repositories/userRepository");
 
-module.exports = async({ name, username, email, password, avatarFile, headerImagFile }, userRepository) => {
+module.exports = async({ name, username, email, password, avatarFile, headerImagFile }) => {
     const existingUser = await userRepository.findByEmail(email);
     if (existingUser){
         throw new Error("Email já em uso")

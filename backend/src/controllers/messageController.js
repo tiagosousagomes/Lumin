@@ -2,7 +2,7 @@ const Message = require("../models/message/messageModel");
 const User = require("../models/user/userModel");
 const crypto = require("crypto");
 require("dotenv").config();
-const aiService = require("../Services/aiService");
+const aiService = require("../services/aiService");
 
 // SISTEMA PARA CRIPTOGRAFIA DE MENSAGENS
 const SECRET_KEY = process.env.SECRET_KEY

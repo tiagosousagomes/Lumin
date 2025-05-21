@@ -1,3 +1,9 @@
+openapi: 3.0.0
+info:
+  title: Posts
+  version: 1.0.0
+  description: Posts enpoints
+
 paths:
   /api/post:
     get:

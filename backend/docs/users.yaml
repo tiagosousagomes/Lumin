@@ -1,3 +1,9 @@
+openapi: 3.0.0
+info:
+  title: Users
+  version: 1.0.0
+  description: Users enpoints
+
 paths:
   /api/user:
     get:

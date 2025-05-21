@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: API de Comentários
+  title: Coments
   version: 1.0.0
-  description: API para gerenciar comentários em posts
+  description: Comments enpoints
 
 paths:
   /api/comment/post:

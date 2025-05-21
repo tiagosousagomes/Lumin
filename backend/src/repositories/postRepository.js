@@ -7,7 +7,7 @@ const postRepository = {
     },
 
     findAll: async () => {
-        return await Post.find()
+        return Post.find()
             .sort({
                 createAt: -1
             })
@@ -22,12 +22,10 @@ const postRepository = {
     },
 
     findByUserId: async (userId) => {
-        return await Post.find({
-                author: userId
-            })
-            .sort({
-                creteAt: -1
-            })
+        return Post.find({
+            author: userId
+        })
+            .sort({createAt: -1})
             .populate("author", "name username profilePicture")
             .populate({
                 path: "comments",
@@ -39,14 +37,14 @@ const postRepository = {
     },
 
     update: async (id, data) => {
-        return await Post.findByIdAndUpdate(id, data, {
+        return Post.findByIdAndUpdate(id, data, {
             new: true,
             runValidators: true,
         }).populate("author", "name username profilePicture");
     },
 
     remove: async (id) => {
-        return await Post.findByIdAndDelete(id);
+        return Post.findByIdAndDelete(id);
     },
 
     likeOrDislike: async (postId, userId) => {

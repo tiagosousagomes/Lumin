@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: API de Curtidas
+  title: Likes
   version: 1.0.0
-  description: API para gerenciar curtidas em posts
+  description: Likes enpoints
 
 paths:
   /api/like/post/{postID}:
