@@ -4,7 +4,7 @@ const multer = require("multer");
 
 const createPost = require("../usecases/post/createPost");
 const deletePost = require("../usecases/post/deletePost");
-const getAllPosts = require("../usecases/post/getAllPosts");
+const getAllPosts = require("../usecases/post/getAllPosts"); 
 const getPostById = require("../usecases/post/getPostById");
 const getPostsFromUser = require("../usecases/post/getPostsFromUser");
 const likePost = require("../usecases/post/likePost");
@@ -45,22 +45,11 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
 	try {
-		const posts = await Post.find()
-			.sort({
-				createAt: -1
-			})
-			.populate("author", "name username profilePicture")
-			.populate({
-				path: "comments",
-				populate: {
-					path: "author",
-					select: "name username profilePicture"
-				}
-			});
+		const posts = await getAllPosts();
 
 		res.status(200).json({
 			success: true,
-			message: "Lista de Posts:",
+			message: "Posts encontrados:",
 			data: posts,
 		});
 	} catch (err) {
@@ -72,34 +61,16 @@ const getAllPosts = async (req, res) => {
 	}
 };
 
-// Obter todos os posts de um usuário
 const getAllPostFromUser = async (req, res) => {
 	try {
 		const userID = req.params.id;
-
-		const user = await User.findById(userID);
-		if (!user) {
-			return res.status(404).json({
-				success: false,
-				message: "Usuário não encontrado",
-			});
-		}
-
-		const posts = await Post.find({
-				author: userID
-			})
-			.sort({
-				createAt: -1
-			})
-			.populate("author", "name username profilePicture")
-			.populate({
-				path: "comments",
-				populate: {
-					path: "author",
-					select: "name username profilePicture"
-				}
-			});
-
+		const posts = await getPostsFromUser(userID);
+		res.status(200).json({
+			success: true,
+			message: "Posts do usuário encontrados:",
+			data: posts,
+		});
+	
 		res.status(200).json({
 			success: true,
 			message: "Posts do usuário:",
@@ -114,24 +85,15 @@ const getAllPostFromUser = async (req, res) => {
 	}
 };
 
-// Obter um post por ID
 const getPostById = async (req, res) => {
 	try {
 		const postID = req.params.id;
-		const post = await Post.findById(postID)
-			.populate("author", "name username profilePicture")
-			.populate({
-				path: "comments",
-				populate: {
-					path: "author",
-					select: "name username profilePicture"
-				}
-			});
+		const post = await getPostById(postID);
 
 		if (!post) {
 			return res.status(404).json({
 				success: false,
-				message: "Post não encontrado!",
+				message: "Post não encontrado",
 			});
 		}
 
@@ -149,37 +111,13 @@ const getPostById = async (req, res) => {
 	}
 };
 
-// Atualizar um post
 const updatePost = async (req, res) => {
 	try {
-		const {
-			content
-		} = req.body;
-		const image = req.file;
+		const postID = req.params.id;
+		const { content } = req.body;
+		const file = req.file;
 
-		const updateData = {
-			content,
-			updateAt: Date.now() // Atualiza a data de atualização
-		};
-
-		if (image) {
-			updateData.image = {
-				data: image.buffer,
-				contentType: image.mimetype
-			};
-		}
-
-		const post = await Post.findByIdAndUpdate(req.params.id, updateData, {
-			new: true,
-			runValidators: true,
-		}).populate("author", "name username profilePicture");
-
-		if (!post) {
-			return res.status(404).json({
-				success: false,
-				message: "Post não encontrado!",
-			});
-		}
+		const updatePost = await updatePost({ postID, content, file });
 
 		res.status(200).json({
 			success: true,
@@ -195,11 +133,10 @@ const updatePost = async (req, res) => {
 	}
 };
 
-// Deletar um post
 const deletePost = async (req, res) => {
 	try {
 		const postID = req.params.id;
-		const post = await Post.findByIdAndDelete(postID);
+		await deletePost(postID);
 
 		if (!post) {
 			return res.status(404).json({
@@ -221,40 +158,22 @@ const deletePost = async (req, res) => {
 	}
 };
 
-
 const likePost = async (req, res) => {
     try {
         const postID = req.params.id; 
-        const userID = req.body.userId; ão
+        const userID = req.body.userId;
 
-        // Verifica se o post existe
-        const post = await Post.findById(postID);
-        if (!post) {
-            return res.status(404).json({
-                success: false,
-                message: "Post não encontrado",
-            });
-        }
+		const { liked, likesCount, likes} = await likePost({postID, userID});
 
-        
-        const index = post.likes.indexOf(userID);
-
-        if (index === -1) {
-            post.likes.push(userID);
-        } else {
-            post.likes.splice(index, 1);
-        }
-
-      
-        await post.save();
-
-        res.status(200).json({
-            success: true,
-            message: index === -1 ? "Post curtido com sucesso" : "Post descurtido com sucesso",
-            liked: index === -1,
-            likesCount: post.likes.length,
-            likes: post.likes, 
-        });
+		res.status(200).json({
+			success: true,
+			message: liked ? "Post curtido com sucesso" : "Post descurtido com sucesso",
+			data: {
+				liked,
+				likesCount,
+				likes
+			}
+		});
     } catch (err) {
         res.status(500).json({
             success: false,
@@ -263,7 +182,6 @@ const likePost = async (req, res) => {
         });
     }
 };
-
 
 module.exports = {
 	createPost: [upload.single("image"), createPost],
