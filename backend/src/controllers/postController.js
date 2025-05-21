@@ -2,6 +2,14 @@ const Post = require("../models/post/postModel");
 const User = require("../models/user/userModel");
 const multer = require("multer");
 
+const createPost = require("../usecases/post/createPost");
+const deletePost = require("../usecases/post/deletePost");
+const getAllPosts = require("../usecases/post/getAllPosts");
+const getPostById = require("../usecases/post/getPostById");
+const getPostsFromUser = require("../usecases/post/getPostsFromUser");
+const likePost = require("../usecases/post/likePost");
+const updatePost = require("../usecases/post/updatePost");
+
 // Configuração do multer para armazenar a imagem na memória
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -13,30 +21,13 @@ const upload = multer({
 
 const createPost = async (req, res) => {
 	try {
-		const {
-			content,
-			author
-		} = req.body;
-		const image = req.file;
-
-		const user = await User.findById(author);
-		if (!user) {
-			return res.status(404).json({
-				success: false,
-				message: "Autor não encontrado",
-			});
-		}
-
-		const post = new Post({
+		const { content, author } = req.body;
+		const file = req.file;
+		const post = await createPost({
 			content,
 			author,
-			image: image ? {
-				data: image.buffer,
-				contentType: image.mimetype
-			} : undefined,
+			file
 		});
-
-		await post.save();
 
 		res.status(201).json({
 			success: true,
@@ -52,7 +43,6 @@ const createPost = async (req, res) => {
 	}
 };
 
-// Listar todos os posts
 const getAllPosts = async (req, res) => {
 	try {
 		const posts = await Post.find()
