@@ -1,14 +1,23 @@
-const sendMessage = require("../useCases/message/sendMassage");
-const markMessageAsRead = require("../useCases/message/markMessageAsRead");
-const getMessagesBetweenUsers = require("../useCases/message/getMessageBetweenUsers");
-const deleteMessage = require("../useCases/message/deleteMessage");
-const promptWithGemini = require("../useCases/message/");
+const sendMessageUseCase = require("../../useCases/message/sendMessage");
+const markMessageAsReadUseCase = require("../../useCases/message/markMessageAsRead");
+const getMessagesBetweenUsersUseCase = require("../../useCases/message/getMessagesBetweenUsers");
+const getMessagesUseCase = require("../../useCases/message/getMessages");
+const deleteMessageUseCase = require("../../useCases/message/deleteMessage");
+const promptWithGeminiUseCase = require("../../useCases/message/promptWithGemini");
 
 const sendMessage = async (req, res) => {
   try {
-    const { senderID, receiverID, contet}  = req.body;
+    const {
+      senderID,
+      receiverID,
+      content
+    } = req.body;
 
-    const message = await sendMessage({senderID, receiverID, contet});
+    const message = await sendMessageUseCase({
+      senderID,
+      receiverID,
+      content
+    });
 
     res.status(200).json({
       success: true,
@@ -16,153 +25,160 @@ const sendMessage = async (req, res) => {
       data: message,
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Erro interno",
+      error: err.message
+    });
   }
 };
 
 const markMessageAsRead = async (req, res) => {
   try {
-    const { messageID } = req.body;
+    const {
+      messageID
+    } = req.body;
 
-    const message = await Message.findById(messageID);
+    const updatedMessage = await markMessageAsReadUseCase({
+      messageID
+    });
 
-    if (!message) {
+    if (!updatedMessage) {
       return res.status(404).json({
         success: false,
         message: "Mensagem não encontrada",
       });
     }
 
-    message.read = true;
-
-    await message.save();
-
     res.status(200).json({
       success: true,
       message: "Mensagem marcada como lida",
-      data: message,
+      data: updatedMessage,
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Erro interno",
+      error: err.message
+    });
   }
 };
 
 const getMessages = async (req, res) => {
   try {
-    const { userID1, userID2 } = req.query;
+    const {
+      userID1,
+      userID2
+    } = req.query;
 
-    const messages = await Message.find({
-      $or: [
-        { sender: userID1, receiver: userID2 },
-        { sender: userID2, receiver: userID1 },
-      ],
-    }).sort({ createdAt: 1 });
-
-    const decryptedMessages = messages.map((message) => {
-      const decryptedContent = decryptMessage(message.content, message.iv);
-      return { ...message.toObject(), content: decryptedContent };
+    const messages = await getMessagesUseCase({
+      userID1,
+      userID2
     });
 
     res.status(200).json({
       success: true,
       message: "Mensagens recuperadas com sucesso",
-      data: decryptedMessages,
+      data: messages,
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Erro interno",
+      error: err.message
+    });
   }
 };
 
 const deleteMessage = async (req, res) => {
   try {
-    const { messageID, userID } = req.body;
+    const {
+      messageID,
+      userID
+    } = req.body;
 
-    const message = await Message.findById(messageID);
+    const result = await deleteMessageUseCase({
+      messageID,
+      userID
+    });
 
-    if (!message) {
+    if (!result.found) {
       return res.status(404).json({
         success: false,
-        message: "Mensagem não encontrada",
+        message: "Mensagem não encontrada"
       });
     }
 
-    if (
-      message.sender.toString() !== userID &&
-      message.receiver.toString() !== userID
-    ) {
+    if (!result.authorized) {
       return res.status(403).json({
         success: false,
-        message: "Você não tem permissão para excluir essa mensagem",
+        message: "Você não tem permissão para excluir essa mensagem"
       });
     }
-
-    await Message.deleteOne({ _id: messageID });
 
     res.status(200).json({
       success: true,
-      message: "Mensagem excluída com sucesso",
+      message: "Mensagem excluída com sucesso"
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Erro interno", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 };
 
 const getMessagesBetweenUsers = async (req, res) => {
   try {
-    const { userId, receiverId } = req.params;
-    
-    const messages = await Message.find({
-      $or: [
-        { sender: userId, receiver: receiverId },
-        { sender: receiverId, receiver: userId }
-      ]
-    }).sort({ createdAt: 1 });
-    
-    const decryptedMessages = messages.map(message => {
-      const decryptedContent = decryptMessage(message.content, message.iv);
-      return {
-        id: message._id,
-        senderId: message.sender,
-        receiverId: message.receiver,
-        text: decryptedContent,
-        read: message.read,
-        time: message.createdAt
-      };
+    const {
+      userId,
+      receiverId
+    } = req.params;
+
+    const messages = await getMessagesBetweenUsersUseCase({
+      userId,
+      receiverId
     });
-    
-    return res.status(200).json({
+
+    res.status(200).json({
       success: true,
-      messages: decryptedMessages
+      messages
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: 'Failed to fetch messages',
       error: error.message
     });
   }
 };
 
 const promptWithGemini = async (req, res) => {
-  const { question } = req.body;
+  const {
+    question
+  } = req.body;
 
   if (!question) {
-    return res.status(400).json({ success: false, message: "Pergunta não fornecida" });
+    return res.status(400).json({
+      success: false,
+      message: "Pergunta não fornecida"
+    });
   }
-  
+
   try {
-    const response = await aiService.prompt(question);
-  
+    const response = await promptWithGeminiUseCase({
+      question
+    });
+
     res.status(200).json({
       success: true,
-      message: "AI response generated",
+      message: "Resposta da IA gerada com sucesso",
       response,
     });
   } catch (error) {
-    console.error("AI error:", error);
     res.status(500).json({
       success: false,
-      message: "Error generating response",
+      message: "Erro ao gerar resposta com a IA",
+      error: error.message,
     });
   }
 };
