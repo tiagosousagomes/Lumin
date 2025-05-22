@@ -1,7 +1,4 @@
-const Post = require("../models/post/postModel");
-const User = require("../models/user/userModel");
 const multer = require("multer");
-
 const createPost = require("../usecases/post/createPost");
 const deletePost = require("../usecases/post/deletePost");
 const getAllPosts = require("../usecases/post/getAllPosts"); 

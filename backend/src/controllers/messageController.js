@@ -1,58 +1,16 @@
-const Message = require("../models/message/messageModel");
-const User = require("../models/user/userModel");
-const crypto = require("crypto");
-require("dotenv").config();
-const aiService = require("../services/aiService");
-
-// SISTEMA PARA CRIPTOGRAFIA DE MENSAGENS
-const SECRET_KEY = process.env.SECRET_KEY
-const ALGORITHM = "aes-256-cbc";
-
-const encryptMessage = (message) => {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(SECRET_KEY), iv);
-  let encrypted = cipher.update(message, "utf8", "hex");
-  encrypted += cipher.final("hex");
-  return { encryptedMessage: encrypted, iv: iv.toString("hex") };
-};
-
-const decryptMessage = (encryptedContent, iv) => {
-  const decipher = crypto.createDecipheriv(
-    ALGORITHM,
-    Buffer.from(SECRET_KEY),
-    Buffer.from(iv, "hex")
-  );
-  let decrypted = decipher.update(encryptedContent, "hex", "utf8");
-  decrypted += decipher.final("utf-8");
-  return decrypted;
-};
+const sendMessage = require("../useCases/message/sendMassage");
+const markMessageAsRead = require("../useCases/message/markMessageAsRead");
+const getMessagesBetweenUsers = require("../useCases/message/getMessageBetweenUsers");
+const deleteMessage = require("../useCases/message/deleteMessage");
+const promptWithGemini = require("../useCases/message/");
 
 const sendMessage = async (req, res) => {
   try {
-    const { senderID, receiverID, content } = req.body;
+    const { senderID, receiverID, contet}  = req.body;
 
-    const sender = await User.findById(senderID);
-    const receiver = await User.findById(receiverID);
+    const message = await sendMessage({senderID, receiverID, contet});
 
-    if (!sender || !receiver) {
-      return res.status(404).json({
-        success: false,
-        message: "Usuário não encontrado",
-      });
-    }
-
-    const { encryptedMessage, iv } = encryptMessage(content);
-
-    const message = new Message({
-      sender: sender._id,
-      receiver: receiver._id,
-      content: encryptedMessage,
-      iv: iv,
-    });
-
-    await message.save();
-
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Mensagem enviada com sucesso",
       data: message,
