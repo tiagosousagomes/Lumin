@@ -1,41 +1,17 @@
-const Comment = require("../models/comment/commentModel");
-const User = require("../models/user/userModel");
-const Post = require("../models/post/postModel");
+const createCommentUC = require("../usecases/comment/createComment");
+const deleteCommentUC = require("../usecases/comment/deleteComment");
+const getCommentsByPostUC = require("../usecases/comment/getCommentsByPost");
 
 const createComment = async (req, res) => {
 	try {
-		const {
-			userID,
-			postID,
-			content
-		} = req.body;
+		const { postID, content } = req.body;
 
-		console.log({
-			userID,
-			postID
-		});
+		const comment = await createCommentUC(userID, postID, content);
 
-		const user = await User.findById(userID);
-		const post = await Post.findById(postID);
-
-		if (!user || !post) {
-			return res.status(404).json({
-				success: false,
-				message: "Usuario ou post não encontrado!",
-			});
-		}
-
-		const comment = new Comment({
-			author: userID,
-			post: postID,
-			content
-		});
-		await comment.save();
-
-		res.status(201).json({
+		res.status(200).json({
 			success: true,
-			message: "comentario adicionado",
-			data: post,
+			message: "Comentario adicionado com sucesso.",
+			data: comment,
 		});
 	} catch (err) {
 		res.status(500).json({
@@ -48,21 +24,14 @@ const createComment = async (req, res) => {
 
 const getCommentsByPost = async (req, res) => {
 	try {
-		const postID = req.params.postID;
+		const { postID } = req.params;
 
-		const comment = await Comment.find({
-			post: postID
-		}).populate(
-			"author",
-			"name username profilePicture"
-		);
-
-		console.log(comment);
+		const comments = await getCommentsByPostUC(postID);
 
 		res.status(200).json({
 			success: true,
-			message: "comentarios encontradas com sucesso.",
-			data: comment,
+			message: "Comentarios encontrados com sucesso.",
+			data: comments,
 		});
 	} catch (err) {
 		res.status(500).json({
@@ -73,51 +42,11 @@ const getCommentsByPost = async (req, res) => {
 	}
 };
 
-/* 
-const updateComment = async (req, res) => {
-  try {
-    const { commentID } = req.params;
-    const { content } = req.body;
-
-    const comment = await Comment.findById(commentID);
-    if (!comment) {
-      return res.status(404).json({
-        success: false,
-        message: "Comentário não encontrado",
-      });
-    }
-
-    comment.content = content;
-    comment.updatedAt = Date.now();
-    await comment.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Comentário atualizado com sucesso",
-      data: comment,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Erro ao atualizar comentário",
-      error: err.message,
-    });
-  }
-};
-*/
 const deleteComment = async (req, res) => {
 	try {
-		const {
-			commentID
-		} = req.params;
+		const { commentID } = req.params;
 
-		const comment = await Comment.findByIdAndDelete(commentID);
-		if (!comment) {
-			return res.status(404).json({
-				success: false,
-				message: "Comentário não encontrado",
-			});
-		}
+		await deleteCommentUC(commentID);
 
 		res.status(200).json({
 			success: true,
