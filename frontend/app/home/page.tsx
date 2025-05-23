@@ -18,47 +18,56 @@ export default function Home() {
   }, [])
 
   const trends = [
+   
     {
-      category: "Futebol",
-      hashtag: "#NeymarTraiu?",
-      posts: "15.2K",
+      category: "Provas",
+      hashtag: "#Calculo2Desafia",
+      posts: "18.9K",
     },
     {
-      category: "Tecnologia",
-      hashtag: "#gatosIA",
-      posts: "12.8K",
+      category: "Trote",
+      hashtag: "#TroteSolidario",
+      posts: "12.4K",
     },
     {
-      category: "Gaming",
-      hashtag: "#OutlastSuperestimado",
-      posts: "9.7K",
+      category: "Carreira",
+      hashtag: "#Estagios2025",
+      posts: "15.7K",
     },
     {
-      category: "Musica",
-      hashtag: "#AdeleQueen",
-      posts: "18.3K",
+      category: "Dúvidas",
+      hashtag: "#ComoFazerTCC",
+      posts: "22.1K",
     },
     {
-      category: "Filmes",
-      hashtag: "#Inception",
-      posts: "7.5K",
+      category: "Greve",
+      hashtag: "#ProfessoresEmGreve",
+      posts: "14.5K",
     },
-  ]
+   
+    {
+      category: "Cultura",
+      hashtag: "#FestivalUniversitário",
+      posts: "6.7K",
+    }
+];
   return (
-    <div className="min-h-screen bg-[#222325] text-white">
+    <div className="min-h-screen bg-[#F5F5F5] text-[#615fff]">
       <TopNavigation />
       <div className="container mx-auto grid grid-cols-1 gap-4 p-4 md:grid-cols-4 lg:grid-cols-7">
         <Sidebar className="hidden md:block md:col-span-1 lg:col-span-2" />
         <Feed className="md:col-span-3 lg:col-span-3" />
         <div className="hidden lg:block lg:col-span-2">
-          <div className="sticky top-20 rounded-xl bg-[#2a2b2d] p-4">
+          <div className="sticky top-20 rounded-xl bg-[#FFFFFF] p-4">
             <h2 className="mb-4 text-xl font-bold">Trending</h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {trends.map((trends,i) => (
-                <div key={i} className="space-y-1">
-                  <p className="text-sm text-gray-400">Trends: {trends.category}</p>
-                  <p className="font-medium">{trends.hashtag}</p>
-                  <p className="text-sm text-gray-400">{trends.posts}</p>
+                <div key={i} className="space-y-[1px]">
+                  <p className="text-sm text-[#212121]">Trends: {trends.category}</p>
+                  <div className="flex ali">
+                   <p className="font-medium">{trends.hashtag}</p>
+                  </div>
+                   <p className="font-sm text-[#212121]"> {trends.posts} posts</p>
                 </div>
               ))}
             </div>

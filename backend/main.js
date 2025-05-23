@@ -41,7 +41,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
         initializeSocket(server);
 
-        const PORT = process.env.PORT_CONNECT_SERVER;
+        const PORT = process.env.PORT;
         server.listen(PORT, () => {
             logger.routes(`Servidor rodando na porta ${PORT}`);
         });

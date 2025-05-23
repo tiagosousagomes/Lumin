@@ -19,6 +19,9 @@ const createPost = async (req, res) => {
 		} = req.body;
 		const image = req.file;
 
+		console.log("Conteúdo do post:", content);
+		console.log("ID do autor:", author);	
+
 		const user = await User.findById(author);
 		if (!user) {
 			return res.status(404).json({
@@ -36,7 +39,9 @@ const createPost = async (req, res) => {
 			} : undefined,
 		});
 
+		console.log("Dados do post:", post);
 		await post.save();
+		console.log("Post salvo com sucesso:", post);
 
 		res.status(201).json({
 			success: true,
@@ -276,7 +281,7 @@ const likePost = async (req, res) => {
 
 
 module.exports = {
-	createPost: [upload.single("image"), createPost],
+	createPost,
 	getAllPosts,
 	getAllPostFromUser,
 	getPostById,

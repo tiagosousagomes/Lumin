@@ -264,7 +264,7 @@ export function Feed({ className }: FeedProps) {
 
   return (
     <div className={cn("space-y-4", className)}>
-      <Card className="border-gray-800 bg-[#2a2b2d]">
+      <Card className="border-gray-800 bg-[#FFFFFF] text-[#212121]">
         <CardHeader className="flex-row gap-4 space-y-0 pb-2">
           <Avatar>
             <AvatarImage
@@ -277,8 +277,8 @@ export function Feed({ className }: FeedProps) {
           </Avatar>
           <div className="flex-1">
             <Textarea
-              placeholder="O que está acontecendo?"
-              className="min-h-12 resize-none border-none bg-transparent p-0 text-white placeholder:text-gray-400 focus-visible:ring-0"
+              placeholder="O que está pensando?"
+              className="min-h-12 resize-none border-none bg-transparent p-0 text-[#212121] placeholder:text-[#5a5a5a] focus-visible:ring-0"
               value={postContent}
               onChange={(e) => setPostContent(e.target.value)}
             />
@@ -287,7 +287,7 @@ export function Feed({ className }: FeedProps) {
 
         <CardFooter className="flex justify-between items-center border-t border-gray-800 pt-4">
           <div className="flex items-center gap-2">
-            <label className="cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90">
+            <label className="cursor-pointer text-[#615fff] hover:text-[#615fff]/90">
               <ImageIcon />
               <input
                 type="file"
@@ -299,15 +299,15 @@ export function Feed({ className }: FeedProps) {
             {imageFile && (
               <span className="text-xs text-white">{imageFile.name}</span>
             )}
-            <div className="relative emoji-picker-container">
+            <div className="relative emoji-picker-container top-1">
               <button 
-                className="emoji-button cursor-pointer text-[#4B7CCC] hover:text-[#4B7CCC]/90"
+                className="emoji-button cursor-pointer text-[#615fff] hover:text-[#615fff]/90"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               >
                 <SmilePlus />
               </button>
               {showEmojiPicker && (
-                <div className="absolute top-1 left-0 z-50">
+                <div className="absolute left-0 z-50">
                   <EmojiPicker
                     onEmojiClick={handleEmojiClick}
                     height={400}
@@ -319,7 +319,7 @@ export function Feed({ className }: FeedProps) {
           </div>
 
           <Button
-            className="rounded-full bg-[#4B7CCC] text-black hover:bg-[#4B7CCC]/90"
+            className="rounded-full bg-[#615fff] text-[#f5f5f5] hover:bg-[#615fff]/90"
             disabled={!postContent.trim()}
             onClick={handleCreatePost}
           >
@@ -328,11 +328,14 @@ export function Feed({ className }: FeedProps) {
         </CardFooter>
       </Card>
 
-      <div className="space-y-4">
+      <div className="">
         {posts.map((post) => (
-          <Card key={post._id} className="border-gray-800 bg-[#2a2b2d]">
+          <Card key={post._id} className="border-gray-800 bg-[#FFFFFF] text-black">
             <CardHeader className="flex-row items-start gap-4 space-y-0 pb-2">
-              <Avatar>
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                     <Avatar>
                 <AvatarImage
                   src={post.author?.profilePicture}
                   alt={post.author?.username || "Usuário desconhecido"}
@@ -341,12 +344,6 @@ export function Feed({ className }: FeedProps) {
                   {post.author?.name ? post.author.name[0] : "?"}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-white">
-                      {post.author?.name || "Usuário desconhecido"}
-                    </span>
                     <span className="text-sm text-gray-400">
                       {post.author?.username ? `@${post.author.username}` : "@desconhecido"}
                     </span>
@@ -360,7 +357,7 @@ export function Feed({ className }: FeedProps) {
                     <span className="sr-only">More options</span>
                   </Button>
                 </div>
-                <p className="text-white">{post.content}</p>
+                <p className="text-black">{post.content}</p>
               </div>
             </CardHeader>
             <CardContent className="pb-2 pt-0">
@@ -401,7 +398,7 @@ export function Feed({ className }: FeedProps) {
               <Button
                 variant="muted"
                 size="sm"
-                className="gap-1 text-gray-400 hover:text-[#108CD9]"
+                className="gap-1 text-gray-400 hover:text-[#615fff]"
               >
                 <MessageCircle className="h-4 w-4" />
                 <span>{post.comments.length}</span>
@@ -410,7 +407,7 @@ export function Feed({ className }: FeedProps) {
               <Button
                 variant="muted"
                 size="sm"
-                className="text-gray-400 hover:text-[#108CD9]"
+                className="text-gray-400 hover:text-[#4CAF50]"
               >
                 <Share className="h-4 w-4" />
               </Button>
@@ -421,9 +418,9 @@ export function Feed({ className }: FeedProps) {
                 size="sm"
                 className={`${
                   hasUserBookmarkedPost(post._id)
-                    ? "text-[#4B7CCC]"
+                    ? "text-[#615fff]"
                     : "text-gray-400"
-                } hover:text-[#4B7CCC]`}
+                } hover:text-[#615fff]`}
                 onClick={() => handleToggleBookmark(post._id)}
                 disabled={isBookmarking}
               >

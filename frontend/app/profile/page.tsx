@@ -269,11 +269,11 @@ export default function ProfilePage() {
   console.log("Is own profile:", isOwnProfile, "Current user:", currentUserId, "Profile user:", user._id);
 
   return (
-    <div className="min-h-screen bg-[#222325] text-white">
+    <div className="min-h-screen bg-[#F5F5F5] text-[#222321]">
       <TopNavigation />
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto">
         {isEditing ? (
-          <div className="bg-[#2a2b2d] p-6 rounded-xl">
+          <div className="bg-[#2a2b2d] p-6 rounded">
             <h2 className="text-xl font-bold mb-4">Editar Perfil</h2>
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div>
@@ -283,7 +283,7 @@ export default function ProfilePage() {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full p-2 rounded bg-[#222325] border border-gray-700 text-white"
+                  className="w-full p-2 rounded bg-[#222325] border border-gray-700 text-black"
                 />
               </div>
 
@@ -294,7 +294,7 @@ export default function ProfilePage() {
                   name="username"
                   value={formData.username}
                   onChange={handleInputChange}
-                  className="w-full p-2 rounded bg-[#222325] border border-gray-700 text-white"
+                  className="w-full p-2 rounded bg-[#222325] border border-gray-700 text-black"
                 />
               </div>
 
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                   name="bio"
                   value={formData.bio}
                   onChange={handleInputChange}
-                  className="w-full p-2 rounded bg-[#222325] border border-gray-700 text-white"
+                  className="w-full p-2 rounded bg-[#222325] border border-gray-700 text-black"
                   rows={3}
                 />
               </div>
@@ -379,7 +379,7 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-4">
             <div className="relative">
-              <div className="h-48 w-full overflow-hidden rounded-xl bg-[#2a2b2d]">
+              <div className="h-48 w-full overflow-hidden bg-[#2a2b2d]">
                 <Image
                   src={user.headerImage ? getImageUrl(user.headerImage) : "/placeholder.svg"}
                   height={300}
@@ -388,7 +388,7 @@ export default function ProfilePage() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-16 left-4 rounded-full border-4 border-[#222325] bg-[#2a2b2d]">
+              <div className="absolute -bottom-16 left-4 rounded-full border-4 border-[#615fff] bg-[#2a2b2d]">
                 <Avatar className="h-32 w-32">
                   <AvatarImage
                     src={user.avatar ? getImageUrl(user.avatar) : "/placeholder.svg"}
@@ -451,29 +451,29 @@ export default function ProfilePage() {
             </div>
 
             <Tabs defaultValue="posts" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 bg-[#2a2b2d]">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-400">
                 <TabsTrigger value="posts">Posts</TabsTrigger>
                 <TabsTrigger value="replies">Respostas</TabsTrigger>
                 <TabsTrigger value="media">Mídia</TabsTrigger>
                 <TabsTrigger value="likes">Curtidas</TabsTrigger>
               </TabsList>
               <TabsContent value="posts" className="mt-4">
-                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#2a2b2d]">
+                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#FFFFFF]">
                   <p className="text-gray-400">Nenhum post ainda</p>
                 </Card>
               </TabsContent>
               <TabsContent value="replies" className="mt-4">
-                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#2a2b2d]">
+                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#FFFFFF]">
                   <p className="text-gray-400">Nenhuma resposta ainda</p>
                 </Card>
               </TabsContent>
               <TabsContent value="media" className="mt-4">
-                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#2a2b2d]">
+                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#FFFFFF]">
                   <p className="text-gray-400">Nenhuma mídia ainda</p>
                 </Card>
               </TabsContent>
               <TabsContent value="likes" className="mt-4">
-                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#2a2b2d]">
+                <Card className="flex h-40 items-center justify-center border-gray-800 bg-[#FFFFFF]">
                   <p className="text-gray-400">Nenhuma curtida ainda</p>
                 </Card>
               </TabsContent>
