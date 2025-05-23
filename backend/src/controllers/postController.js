@@ -1,11 +1,11 @@
 const multer = require("multer");
-const createPost = require("../usecases/post/createPost");
-const deletePost = require("../usecases/post/deletePost");
-const getAllPosts = require("../usecases/post/getAllPosts"); 
-const getPostById = require("../usecases/post/getPostById");
-const getPostsFromUser = require("../usecases/post/getPostsFromUser");
-const likePost = require("../usecases/post/likePost");
-const updatePost = require("../usecases/post/updatePost");
+const createPostUC = require("../usecases/post/createPost");
+const deletePostUC = require("../usecases/post/deletePost");
+const getAllPostsUC = require("../usecases/post/getAllPosts"); 
+const getPostByIdUC = require("../usecases/post/getPostById");
+const getPostsFromUserUC = require("../usecases/post/getPostsFromUser");
+const likePostUC = require("../usecases/post/likePost");
+const updatePostUC = require("../usecases/post/updatePost");
 
 // Configuração do multer para armazenar a imagem na memória
 const storage = multer.memoryStorage();
@@ -20,7 +20,7 @@ const createPost = async (req, res) => {
 	try {
 		const { content, author } = req.body;
 		const file = req.file;
-		const post = await createPost({
+		const post = await createPostUC({
 			content,
 			author,
 			file
@@ -42,7 +42,7 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
 	try {
-		const posts = await getAllPosts();
+		const posts = await getAllPostsUC();
 
 		res.status(200).json({
 			success: true,
@@ -61,7 +61,7 @@ const getAllPosts = async (req, res) => {
 const getAllPostFromUser = async (req, res) => {
 	try {
 		const userID = req.params.id;
-		const posts = await getPostsFromUser(userID);
+		const posts = await getPostsFromUserUC(userID);
 		res.status(200).json({
 			success: true,
 			message: "Posts do usuário encontrados:",
@@ -85,7 +85,7 @@ const getAllPostFromUser = async (req, res) => {
 const getPostById = async (req, res) => {
 	try {
 		const postID = req.params.id;
-		const post = await getPostById(postID);
+		const post = await getPostByIdUC(postID);
 
 		if (!post) {
 			return res.status(404).json({
@@ -114,7 +114,7 @@ const updatePost = async (req, res) => {
 		const { content } = req.body;
 		const file = req.file;
 
-		const updatePost = await updatePost({ postID, content, file });
+		const updatePost = await updatePostUC({ postID, content, file });
 
 		res.status(200).json({
 			success: true,
@@ -133,7 +133,7 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
 	try {
 		const postID = req.params.id;
-		await deletePost(postID);
+		await deletePostUC(postID);
 
 		if (!post) {
 			return res.status(404).json({
@@ -160,7 +160,7 @@ const likePost = async (req, res) => {
         const postID = req.params.id; 
         const userID = req.body.userId;
 
-		const { liked, likesCount, likes} = await likePost({postID, userID});
+		const { liked, likesCount, likes} = await likePostUC({postID, userID});
 
 		res.status(200).json({
 			success: true,

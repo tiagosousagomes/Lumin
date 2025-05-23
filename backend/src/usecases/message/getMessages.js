@@ -1,4 +1,4 @@
-const Message = require("../../models/Message");
+const Message = require("../../models/message/messageModel");
 const decryptMessage = require("../../utils/decryptMessage");
 
 const getMessages = async ({ userID1, userID2 }) => {

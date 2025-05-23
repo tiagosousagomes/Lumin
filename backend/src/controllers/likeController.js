@@ -1,6 +1,6 @@
-const toggleLike = require("../usecases/like/toggleLike");
-const getLikeByPost = require("../usecases/like/getLikeByPost");
-const checkUserLiked = require("../usecases/like/checkUserLiked");
+const toggleLikeUC = require("../usecases/like/toggleLike");
+const getLikeByPostUC = require("../usecases/like/getLikeByPost");
+const checkUserLikedUC = require("../usecases/like/checkUserLiked");
 
 const toggleLike = async (req, res) => {
     try {
@@ -14,7 +14,7 @@ const toggleLike = async (req, res) => {
             });
         }
 
-        const result = await toggleLikeUseCase({
+        const result = await toggleLikeUC({
             postID,
             userID
         });
@@ -41,7 +41,7 @@ const toggleLike = async (req, res) => {
 const getLikeByPost = async (req, res) => {
     try {
         const postID = req.params.postID;
-        const result = await checkUserLikedUseCase({
+        const result = await checkUserLikedUC({
             postID
         });
 
@@ -69,7 +69,7 @@ const getLikeByPost = async (req, res) => {
 const checkUserLiked = async (req, res) => {
     try {
         const { postID, userID } = req.params;
-        const result = await checkUserLikedUseCase({
+        const result = await checkUserLikedUC({
             postID,
             userID
         });

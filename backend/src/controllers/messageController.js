@@ -1,9 +1,9 @@
-const sendMessageUseCase = require("../../useCases/message/sendMessage");
-const markMessageAsReadUseCase = require("../../useCases/message/markMessageAsRead");
-const getMessagesBetweenUsersUseCase = require("../../useCases/message/getMessagesBetweenUsers");
-const getMessagesUseCase = require("../../useCases/message/getMessages");
-const deleteMessageUseCase = require("../../useCases/message/deleteMessage");
-const promptWithGeminiUseCase = require("../../useCases/message/promptWithGemini");
+const sendMessageUseCase = require("../useCases/message/sendMassage");
+const markMessageAsReadUseCase = require("../useCases/message/markMessageAsRead");
+const getMessagesBetweenUsersUseCase = require("../useCases/message/getMessageBetweenUsers");
+const getMessagesUseCase = require("../useCases/message/getMessages");
+const deleteMessageUseCase = require("../useCases/message/deleteMessage");
+const promptWithGeminiUseCase = require("../useCases/message/promptWithGemini");
 
 const sendMessage = async (req, res) => {
   try {
