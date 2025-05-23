@@ -1,53 +1,20 @@
-const Post = require("../models/post/postModel");
-const User = require("../models/user/userModel");
-const Bookmark = require("../models/bookmark/bookmarkModel");
+const toggleBookmarkUC = require("../usecases/bookmark/toogleBookmark");
+const getBookmarksByUserUC = require("../usecases/bookmark/getBookmarksByUser");
+const checkPostBookmarkedUC = require("../usecases/bookmark/checkPostBookmarked");
+const countBookmarksByPostUC = require("../usecases/bookmark/countBookmarsByPost");
 
 const toggleBookmark = async (req, res) => {
     try {
-        const postID = req.params.id;
-        const userID = req.body.userId;
+        const postID = req.params.postId;
+        const userID = req.params.userId;
 
-        if (!userID) {
-            return res.status(400).json({
-                success: false,
-                message: "O ID do usuário é obrigatório",
-            });
-        }
+        const result = await toggleBookmarkUC(postID, userID);
 
-        const post = await Post.findById(postID);
-        if (!post) {
-            return res.status(404).json({
-                success: false,
-                message: "Post não encontrado",
-            });
-        }
-
-        // Verificar se o bookmark já existe
-        const existingBookmark = await Bookmark.findOne({ user: userID, post: postID });
-
-        if (!existingBookmark) {
-            // Criar um novo bookmark se não existir
-            const newBookmark = new Bookmark({
-                user: userID,
-                post: postID,
-            });
-            await newBookmark.save();
-            
-            return res.status(200).json({
-                success: true,
-                message: "Post salvo com sucesso",
-                action: "bookmarked"
-            });
-        } else {
-            // Remover o bookmark se já existir
-            await Bookmark.findByIdAndDelete(existingBookmark._id);
-            
-            return res.status(200).json({
-                success: true,
-                message: "Post removido dos salvos com sucesso",
-                action: "unbookmarked"
-            });
-        }
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result.data
+        });
     } catch (err) {
         res.status(500).json({
             success: false,
@@ -61,21 +28,13 @@ const getBookmarksByUser = async (req, res) => {
     try {
         const userID = req.params.userId;
 
-        const bookmarks = await Bookmark.find({ user: userID })
-            .populate({
-                path: 'post',
-                populate: {
-                    path: 'author',
-                    select: 'name username profilePicture'
-                }
-            })
-            .sort({ createdAt: -1 });
+        const result = await getBookmarksByUserUC(userID);
 
         res.status(200).json({
             success: true,
             message: "Bookmarks encontrados com sucesso",
-            data: bookmarks.map(bookmark => bookmark.post),
-            count: bookmarks.length
+            data: result.data,
+            count: result.count
         });
     } catch (err) {
         res.status(500).json({
@@ -91,7 +50,7 @@ const checkPostBookmarked = async (req, res) => {
         const postID = req.params.postId;
         const userID = req.params.userId;
 
-        const bookmark = await Bookmark.findOne({ user: userID, post: postID });
+        const bookmark = await checkPostBookmarkedUC(postID, userID);
         
         res.status(200).json({
             success: true,
@@ -110,11 +69,12 @@ const countBookmarksByPost = async (req, res) => {
     try {
         const postID = req.params.postId;
 
-        const count = await Bookmark.countDocuments({ post: postID });
+
+        const result = await countBookmarksByPostUC(postID);
 
         res.status(200).json({
             success: true,
-            count
+            count: result.count
         });
     } catch (err) {
         res.status(500).json({
