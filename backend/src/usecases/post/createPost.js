@@ -27,7 +27,6 @@ const createPost = async ({
                             if (error) {
                                 reject(new Error("Erro ao fazer upload da imagem"));
                             } else {
-                                console.log(result);
                                 resolve({
                                     url: result.secure_url,
                                     image_id: result.public_id,

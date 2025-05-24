@@ -6,6 +6,7 @@ const getPostByIdUC = require("../usecases/post/getPostById");
 const getPostsFromUserUC = require("../usecases/post/getPostsFromUser");
 const likePostUC = require("../usecases/post/likePost");
 const updatePostUC = require("../usecases/post/updatePost");
+const deleteAllPostsUC = require("../usecases/post/deleteAllPosts");
 
 // Configuração do multer para armazenar a imagem na memória
 const storage = multer.memoryStorage();
@@ -180,6 +181,22 @@ const likePost = async (req, res) => {
     }
 };
 
+const deleteAllPosts = async (req, res) => {
+	try {
+		await deleteAllPostsUC();
+		res.status(200).json({
+			success: true,
+			message: "Todos os posts foram deletados com sucesso!",
+		});
+	} catch (err) {
+		res.status(500).json({
+			success: false,
+			message: "Erro ao deletar todos os posts",
+			error: err.message,
+		});
+	}
+};
+
 module.exports = {
 	createPost: [upload.single("image"), createPost],
 	getAllPosts,
@@ -187,5 +204,6 @@ module.exports = {
 	getPostById,
 	updatePost: [upload.single("image"), updatePost],
 	deletePost,
+	deleteAllPosts,
 	likePost,
 };
