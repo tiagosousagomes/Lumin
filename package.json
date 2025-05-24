@@ -23,6 +23,7 @@
     "@radix-ui/react-label": "^2.1.2",
     "bcrypt": "^5.1.1",
     "chalk": "^4.1.2",
+    "cloudinary": "^2.6.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
@@ -35,6 +36,7 @@
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.9",
     "socket.io": "^4.8.1",
+    "streamifier": "^0.1.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }
