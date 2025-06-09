@@ -54,16 +54,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#222325] p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F5F5F5] p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#4B7CCC]">Lumin</h1>
+          <h1 className="text-3xl font-bold text-[#615fff]">Lumin</h1>
           <p className="mt-2 text-gray-700">Conecte-se com o mundo</p>
         </div>
 
-        <Card className="border-gray-800 bg-[#2a2b2d]">
+        <Card className="border-gray-800 bg-[#FFFFFF]">
           <CardHeader>
-            <CardTitle className="text-xl text-white">Entrar</CardTitle>
+            <CardTitle className="text-xl text-[#615fff]">Entrar</CardTitle>
             <CardDescription className="text-gray-400">
               Entre com sua conta para continuar
             </CardDescription>
@@ -76,7 +76,7 @@ export default function LoginPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">
+                <Label htmlFor="email" className="text-[#615fff]">
                   Email
                 </Label>
                 <div className="relative">
@@ -85,7 +85,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="email"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 text-black placeholder:text-gray-500 focus-visible:ring-[#615fff]/90"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -95,12 +95,12 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-white">
+                  <Label htmlFor="password" className="text-[#615fff]">
                     Senha
                   </Label>
                   <Link
                     href="/login/forgot-password"
-                    className="text-xs text-[#4B7CCC] hover:underline"
+                    className="text-xs text-[#615fff] hover:underline"
                   >
                     Esqueceu a senha?
                   </Link>
@@ -111,7 +111,7 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="border-gray-700 bg-[#FFFFFF] pl-10 pr-10 text-black placeholder:text-gray-500 focus-visible:ring-[#4B7CCC]/90"
+                    className="border-gray-700 bg-[#FFFFFF] pl-10 pr-10 text-black placeholder:text-gray-500 focus-visible:ring-[#615fff]/90"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -135,11 +135,11 @@ export default function LoginPage() {
                   id="remember"
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked === true)}
-                  className="border-white data-[state=checked]:bg-[#4B7CCC] data-[state=checked]:text-[#ffffff]"
+                  className="border-black data-[state=checked]:bg-[#615fff] data-[state=checked]:text-[#ffffff]"
                 />
                 <Label
                   htmlFor="remember"
-                  className="text-sm font-normal text-white"
+                  className="text-sm font-normal text-[#615fff]"
                 >
                   Lembrar de mim
                 </Label>
@@ -148,16 +148,16 @@ export default function LoginPage() {
             <CardFooter className="flex flex-col space-y-4 p-3">
               <Button
                 type="submit"
-                className="w-full bg-[#FFFFFF] text-[#4b7ccc] hover:bg-[#FFFFFF]/90"
+                className="w-full bg-[#615fff] text-[#FFFFFF] hover:bg-[#615fff]/90"
                 disabled={loading}
               >
                 {loading ? "Entrando..." : "Entrar"}
               </Button>
-              <p className="text-center text-sm text-white">
+              <p className="text-center text-sm text-black">
                 Não tem uma conta?{" "}
                 <Link
                   href="/register"
-                  className="text-[#4B7CCC] hover:underline"
+                  className="text-[#615fff] hover:underline"
                 >
                   Cadastre-se
                 </Link>
