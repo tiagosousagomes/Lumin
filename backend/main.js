@@ -20,11 +20,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(express.json());
-app.use(cors({
-    origin: `${process.env.URL_FRONT}`, 
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-}));
+app.use(cors());
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
