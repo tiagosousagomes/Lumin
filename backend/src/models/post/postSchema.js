@@ -1,4 +1,5 @@
 let mongoose = require("mongoose");
+const { use } = require("react");
 
 const postSchema = new mongoose.Schema({
     content: {
@@ -7,26 +8,31 @@ const postSchema = new mongoose.Schema({
         minlength: [1, "O conteúdo não pode estar vazio"],
     },
     author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
-        required: true,
-    },
-    image: {
-        data: Buffer,
-        contentType: String,
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+            required: true,
+        },
+        username: {
+            type: String,
+            required: true,
+        },
+        avatar: {
+            data: Buffer,
+            contentType: String,
+	},
+
     },
     likes: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "user",
-            default: [],
+            type: Number,
+            default: 0,
         },
     ],
     comments: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "comment",
-            default: [],
+            type: Number,
+            default: 0,
         },
     ],
 },{

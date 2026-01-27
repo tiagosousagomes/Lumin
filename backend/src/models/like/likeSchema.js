@@ -1,7 +1,7 @@
 let mongoose = require("mongoose");
 
 let likeSchema = new mongoose.Schema({
-	user: {
+	author: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
 		required: true
@@ -16,5 +16,6 @@ let likeSchema = new mongoose.Schema({
 	timestamps:true
 }
 );
+likeSchema.index({ user: 1, post: 1 }, { unique: true });
 
 module.exports = likeSchema

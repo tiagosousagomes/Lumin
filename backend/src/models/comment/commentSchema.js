@@ -2,9 +2,11 @@ let mongoose = require("mongoose");
 
 let commentSchema = new mongoose.Schema({
 	author: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "user",
-		required: true
+		id:{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "user",
+			required: true
+		},
 	},
 	post: {
 		type: mongoose.Schema.Types.ObjectId,
@@ -15,6 +17,8 @@ let commentSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "O conteúdo do comentário é obrigatório"],
 		minlength: [1, "O conteúdo do comentário não pode ser vazio"],
+		maxlenghth: [300, "O conteúdo do comentário deve ter no máximo 300 caracteres"],
+		trim: true,
 	},
 },{
 	timestamps:true
